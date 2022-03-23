@@ -1,0 +1,19 @@
+{
+    "name": "Vheos.Games.ShapeTracer.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:c5156182bd413ac41bc3f003394ab1f2",
+        "GUID:85965eb78ee4181428e49aa278351bf3"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
