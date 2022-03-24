@@ -1,4 +1,4 @@
-namespace Vheos.Games.Prototypes.ShapeTracer
+namespace Vheos.Games.ShapeTracer
 {
     using System;
     using System.Linq;

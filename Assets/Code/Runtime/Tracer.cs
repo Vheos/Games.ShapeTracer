@@ -1,4 +1,4 @@
-namespace Vheos.Games.Prototypes.ShapeTracer
+namespace Vheos.Games.ShapeTracer
 {
     using System;
     using System.Linq;
@@ -27,7 +27,7 @@ namespace Vheos.Games.Prototypes.ShapeTracer
         public GridEdge CurrentEdge
         => new(VertexFrom, VertexTo);
         public float ProgressAlongEdge
-        => VertexFrom.DistanceTo(Grid.WorldToGridPosition(transform.position));
+        => VertexFrom.GridPosition.DistanceTo(Grid.WorldToGridPosition(transform.position));
 
         // Privates
         private void Updatable_OnUpdate()
@@ -40,7 +40,7 @@ namespace Vheos.Games.Prototypes.ShapeTracer
             }
 
             // Position
-            Vector3 worldDirection = transform.position.DirectionTowards(Grid.GridToWorldPosition(VertexTo.Position));
+            Vector3 worldDirection = transform.position.DirectionTowards(Grid.GridToWorldPosition(VertexTo.ID));
             transform.position += Speed * Time.deltaTime * worldDirection.Mul(Grid.Instance.transform.localScale);
 
             // Rotation
@@ -49,14 +49,16 @@ namespace Vheos.Games.Prototypes.ShapeTracer
         }
         private void UpdateTargetVertex()
         {
+            /*
             VertexFrom = VertexTo;
             IEnumerable<GridEdge> potentialEdges = VertexFrom.NeighborEdges.Where(t => t.TraceInfo.State == TraceState.None);
             if (!potentialEdges.Any())
                 potentialEdges = VertexFrom.NeighborEdges;
 
             GridEdge targetEdge = potentialEdges.Random();        
-            VertexTo = targetEdge.VertexFarthestFrom(VertexFrom.Position);
+            VertexTo = targetEdge.VertexFarthestFrom(VertexFrom.ID);
             OnStartTracingEdge.Invoke(this, CurrentEdge);
+            */
         }
 
         // Play
@@ -64,7 +66,7 @@ namespace Vheos.Games.Prototypes.ShapeTracer
         {
             base.PlayAwake();
             Get<Updatable>().OnUpdate.SubEnableDisable(this, Updatable_OnUpdate);
-            VertexFrom = Grid.VertexClosestTo(Space.World, transform.position);
+            VertexFrom = Grid.VertexAt(transform.position);
             UpdateTargetVertex();
         }
     }

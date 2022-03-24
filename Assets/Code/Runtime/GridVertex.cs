@@ -1,4 +1,4 @@
-namespace Vheos.Games.Prototypes.ShapeTracer
+namespace Vheos.Games.ShapeTracer
 {
     using System;
     using System.Linq;
@@ -8,17 +8,17 @@ namespace Vheos.Games.Prototypes.ShapeTracer
     using Tools.Extensions.General;
     using Tools.Extensions.UnityObjects;
     using Tools.Extensions.Math;
-    using Vheos.Tools.Utilities;
 
     public struct GridVertex : IEquatable<GridVertex>
     {
         // Publics
-        public Vector3Int ID
+        public GridVectorInt ID
         { get; private set; }
-        public Vector3 Position
+        public GridVector GridPosition
         => ID;
         public Vector3 WorldPosition
-        => Grid.GridToWorldPosition(Position);
+        => Grid.GridToWorldPosition(ID);
+
         public IEnumerable<GridVertex> NeighborVertices
         {
             get
@@ -27,55 +27,18 @@ namespace Vheos.Games.Prototypes.ShapeTracer
                     yield return GetVertex(direction);
             }
         }
-        public IEnumerable<GridEdge> NeighborEdges
-        {
-            get
-            {
-                foreach (var vertex in NeighborVertices)
-                    yield return new(this, vertex);
-            }
-        }
-        public IEnumerable<GridTriangle> NeighborTriangles
-        {
-            get
-            {
-                foreach (var direction in NewUtility.GetEnumValues<TriangleDirection>(true, true))
-                    yield return GetTriangle(direction);
-            }
-        }
         public GridVertex GetVertex(GridDirection direction)
-        => new(ID.Add(direction.VectorInt()));
-        public GridEdge GetEdge(TriangleDirection direction)
-        => default; // WIP
-        public GridTriangle GetTriangle(TriangleDirection direction)
-        => new(ID.Add(direction.VectorInt()));
-
-        public float DistanceTo(Vector3 position)
-        => position.Sub(ID).Abs().SumComp() / 2f;
-        public int DistanceTo(Vector3Int position)
-        => position.Sub(ID).Abs().SumComp() / 2;
+        => new(ID + direction.Vector());
         public bool IsAdjacentTo(GridVertex vertex)
-        => DistanceTo(vertex.ID) == 1;
-        public GridDirection DirectionTowards(GridVertex vertex)
-        {
-            return default; // WIP
-        }
-        public TriangleDirection DirectionTowards(GridTriangle triangle)
-        {
-            return default; // WIP
-        }
-
-        // Privates
-        static private bool IsIDValid(Vector3Int id)
-        => id.SumComp() == 0;
+        => ID.GridDistanceTo(vertex.ID) == 1;
 
         // Constructors
-        public GridVertex(Vector3Int id)
-        => ID = IsIDValid(id) ? id : Grid.InvalidID;
-        public GridVertex(int idX, int idY, int idZ) : this(new Vector3Int(idX, idY, idZ))
-        { }
+        public GridVertex(GridVectorInt id)
+        => ID = id;
         static public GridVertex Zero
-        => new(Vector3Int.zero);
+        => new() { ID = GridVectorInt.Zero };
+        static public GridVertex Invalid
+        => new() { ID = GridVectorInt.Invalid };
 
         // IEquatable
         static public bool operator ==(GridVertex t, GridVertex a)
@@ -86,9 +49,44 @@ namespace Vheos.Games.Prototypes.ShapeTracer
         => ID == a.ID;
         public override bool Equals(object a)
         => a is not null
-        && a is GridVertex vertex
+        && a is GridVectorInt vertex
         && Equals(vertex);
         public override int GetHashCode()
         => ID.GetHashCode();
     }
 }
+
+
+
+/*
+public IEnumerable<GridEdge> NeighborEdges
+{
+    get
+    {
+        foreach (var vertex in NeighborVertices)
+            yield return new(this, vertex);
+    }
+}
+public IEnumerable<GridTriangle> NeighborTriangles
+{
+    get
+    {
+        foreach (var direction in NewUtility.GetEnumValues<TriangleDirection>(true, true))
+            yield return GetTriangle(direction);
+    }
+}
+
+public GridEdge GetEdge(TriangleDirection direction)
+=> default;
+public GridTriangle GetTriangle(TriangleDirection direction)
+=> default;
+
+public GridDirection DirectionTowards(GridVertex vertex)
+{
+    return default; // WIP
+}
+public TriangleDirection DirectionTowards(GridTriangle triangle)
+{
+    return default; // WIP
+}
+*/

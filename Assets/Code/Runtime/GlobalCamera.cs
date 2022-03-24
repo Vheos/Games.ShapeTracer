@@ -1,4 +1,4 @@
-namespace Vheos.Games.Prototypes.ShapeTracer
+namespace Vheos.Games.ShapeTracer
 {
     using System;
     using System.Linq;
@@ -46,7 +46,7 @@ namespace Vheos.Games.Prototypes.ShapeTracer
             else if (mousePosition.y >= 1)
                 movementInput.y = +1;
 
-            Debug.Log($"{movementInput}");
+            // Debug.Log($"{movementInput}");
         }
 
         // Play

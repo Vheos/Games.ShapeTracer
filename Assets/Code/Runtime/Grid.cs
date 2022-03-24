@@ -1,4 +1,4 @@
-namespace Vheos.Games.Prototypes.ShapeTracer
+namespace Vheos.Games.ShapeTracer
 {
     using System;
     using System.Collections.Generic;
@@ -7,8 +7,9 @@ namespace Vheos.Games.Prototypes.ShapeTracer
     using Tools.Extensions.General;
     using Tools.Extensions.UnityObjects;
     using Tools.Extensions.Math;
-    using Vheos.Tools.Utilities;
     using Vheos.Tools.Extensions.Collections;
+
+
 
     public enum TraceState
     {
@@ -65,42 +66,53 @@ namespace Vheos.Games.Prototypes.ShapeTracer
     public class Grid : AStaticComponent<Grid>
     {
         // Inspector
-        [field: SerializeField] public GridType Type { get; private set; }
-        [field: SerializeField, Range(1, 1000)] public int SizeFactor { get; private set; }
+        [field: SerializeField, Range(1, 50)] public int SizeFactor { get; private set; }
 
         // Publics
-        static public Vector3Int InvalidID
-        => int.MaxValue.ToVector3Int();
-        static public IReadOnlyTwoWayDictionary<Axes, Vector3Int> AxesAndVectors
-        => _axesAndVectors;
-        static public IReadOnlyTwoWayDictionary<GridDirection, Vector3Int> GridDirectionsAndVectors
-        => _vertexDirectionsAndVectors;
-        static public Vector3 WorldToGridPosition(Vector3 worldPosition)
+        static public Vector2Int InvalidID
+        => int.MaxValue.ToVector2Int();
+        static public IReadOnlyTwoWayDictionary<GridDirection, GridVector> GridDirectionsAndVectors
+        => _GridDirectionsAndVectors;
+        static public GridVector WorldToGridPosition(Vector3 worldPosition)
         {
-            Vector3 localPosition = worldPosition.Untransform(Instance.transform);
-            float radiusY = localPosition.y / 3.Sqrt();
-            return new(+localPosition.x - radiusY, radiusY * 2f, -localPosition.x - radiusY);
+            if (Instance != null)
+                worldPosition = worldPosition.Untransform(Instance.transform);
+            float radiusY = worldPosition.y / 3.Sqrt();
+            GridVector gridPosition = new(worldPosition.x - radiusY, radiusY * 2f);
+            return gridPosition;
         }
-        static public Vector3 GridToWorldPosition(Vector3 gridPosition)
+        static public Vector3 GridToWorldPosition(GridVector gridPosition)
         {
-            Vector3 localPosition = new(gridPosition.x + gridPosition.y / 2f, 3.Sqrt() * gridPosition.y / 2f, 0);
-            return localPosition.Transform(Instance.transform);
+            Vector3 worldPosition = new(gridPosition.X + gridPosition.Y / 2f, 3.Sqrt() * gridPosition.Y / 2f, 0);
+            if (Instance != null)
+                worldPosition = worldPosition.Transform(Instance.transform);
+            return worldPosition;
         }
-        static public GridTriangle TriangleAt(Space space, Vector3 position)
+        static public GridVector TestVertexAt(Vector3 worldPosition)
         {
-            if (space == Space.World)
-                position = WorldToGridPosition(position);
+            if (Instance != null)
+                worldPosition = worldPosition.Untransform(Instance.transform);
 
-            return position == Vector3.zero
-                 ? new GridVertex(Vector3Int.zero).NeighborTriangles.Random()
-                 : new(position.x.RoundUp(), position.y.RoundUp(), position.z.RoundUp());
+            Vector3 rounded = worldPosition.Round();
+            Vector3 reminder = worldPosition - rounded;
+
+            return reminder.x.Abs() >= reminder.y.Abs()
+                 ? new(rounded.x + (reminder.x + 0.5f * reminder.y).Round(), rounded.y)
+                 : new(rounded.x, rounded.y + (reminder.y + 0.5f * reminder.x).Round());
         }
-        static public GridVertex VertexClosestTo(Space space, Vector3 position)
-        {
-            if (space == Space.World)
-                position = WorldToGridPosition(position);
-            return TriangleAt(Space.Grid, position).VertexClosestTo(position);
-        }
+        static public GridVertex VertexAt(GridVector gridPosition)
+        => new(gridPosition.AxialRound());
+        static public GridVertex VertexAt(Vector3 worldPosition)
+        => VertexAt(WorldToGridPosition(worldPosition));
+        static public GridEdge EdgeAt(GridVector gridPosition)
+        => new((gridPosition * 2 ).AxialRound());
+        static public GridEdge EdgeAt(Vector3 worldPosition)
+        => EdgeAt(WorldToGridPosition(worldPosition));
+        static public GridTriangle TriangleAt(GridVector gridPosition)
+        => new((gridPosition * 3).AxialRound());
+        static public GridTriangle TriangleAt(Vector3 worldPosition)
+        => TriangleAt(WorldToGridPosition(worldPosition));
+
         static public TraceInfo GetTraceInfo(GridEdge edge)
         {
             _infosByEdge.TryAdd(edge, new());
@@ -109,8 +121,7 @@ namespace Vheos.Games.Prototypes.ShapeTracer
 
 
         // Privates
-        static private TwoWayDictionary<Axes, Vector3Int> _axesAndVectors;
-        static private TwoWayDictionary<GridDirection, Vector3Int> _vertexDirectionsAndVectors;
+        static private TwoWayDictionary<GridDirection, GridVector> _GridDirectionsAndVectors;
         static private Dictionary<GridEdge, TraceInfo> _infosByEdge;
         static private void Tracer_OnFinishTracingEdge(Tracer tracer, GridEdge edge)
         {
@@ -129,14 +140,9 @@ namespace Vheos.Games.Prototypes.ShapeTracer
         protected override void PlayAwake()
         {
             base.PlayAwake();
-
-            _axesAndVectors = new();
-            foreach (var axis in NewUtility.GetEnumValues<Axes>(true, true))
-                _axesAndVectors.Add(axis, axis.Vector3Int());
-
-            _vertexDirectionsAndVectors = new();
+            _GridDirectionsAndVectors = new();
             foreach (var direction in NewUtility.GetEnumValues<GridDirection>(true, true))
-                _vertexDirectionsAndVectors.Add(direction, direction.VectorInt());
+                _GridDirectionsAndVectors.Add(direction, direction.Vector());
 
             _infosByEdge = new();
         }
@@ -148,47 +154,4 @@ namespace Vheos.Games.Prototypes.ShapeTracer
                 newTracer => newTracer.OnFinishTracingEdge.SubDestroy(newTracer, Tracer_OnFinishTracingEdge));
         }
     }
-
-
-    static public class GridVertex_Extensions
-    {
-        static public GridDirection GridDirection(this Axes t, AxisDirection a = AxisDirection.Positive)
-        => t switch
-        {
-            Axes.XY when a == AxisDirection.Positive => ShapeTracer.GridDirection.RightDown,
-            Axes.XZ when a == AxisDirection.Positive => ShapeTracer.GridDirection.Right,
-            Axes.YZ when a == AxisDirection.Positive => ShapeTracer.GridDirection.RightUp,
-            Axes.XY when a == AxisDirection.Negative => ShapeTracer.GridDirection.LeftUp,
-            Axes.XZ when a == AxisDirection.Negative => ShapeTracer.GridDirection.Left,
-            Axes.YZ when a == AxisDirection.Negative => ShapeTracer.GridDirection.LeftDown,
-            _ => ShapeTracer.GridDirection.Invalid,
-        };
-        static public Vector3Int VectorInt(this GridDirection t)
-        => t switch
-        {
-            ShapeTracer.GridDirection.RightDown => new(+1, -1, 00),
-            ShapeTracer.GridDirection.Right => new(+1, 00, -1),
-            ShapeTracer.GridDirection.RightUp => new(00, +1, -1),
-            ShapeTracer.GridDirection.LeftUp => new(-1, +1, 00),
-            ShapeTracer.GridDirection.Left => new(-1, 00, +1),
-            ShapeTracer.GridDirection.LeftDown => new(00, -1, +1),
-            _ => Grid.InvalidID,
-        };
-        static public Vector3 Vector(this GridDirection t)
-        => t.VectorInt();
-        static public Vector3Int VectorInt(this TriangleDirection t)
-        => t switch
-        {
-            TriangleDirection.RightDown => new(+1, 00, 00),
-            TriangleDirection.RightUp => new(+1, +1, 00),
-            TriangleDirection.Up => new(00, +1, 00),
-            TriangleDirection.LeftUp => new(00, +1, +1),
-            TriangleDirection.LeftDown => new(00, 00, +1),
-            TriangleDirection.Down => new(+1, 00, +1),
-            _ => default,
-        };
-        static public Vector3 Vector(this TriangleDirection t)
-        => t.VectorInt();
-    }
-
 }

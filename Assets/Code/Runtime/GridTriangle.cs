@@ -1,4 +1,4 @@
-namespace Vheos.Games.Prototypes.ShapeTracer
+namespace Vheos.Games.ShapeTracer
 {
     using System;
     using System.Linq;
@@ -12,25 +12,28 @@ namespace Vheos.Games.Prototypes.ShapeTracer
     public struct GridTriangle : IEquatable<GridTriangle>
     {
         // Publics
-        public Vector3Int ID
+        public GridVectorInt ID
         { get; private set; }
-        public Vector3 FloatID
-        => ID;
-        public Vector3 Center
-        => FloatID.Sub(IsEven.Map(2, 1) / 3f);
-        public Vector3 WorldCenter
-        => Grid.GridToWorldPosition(Center);
-        public bool IsEven
-        => ID.SumComp().IsEven();
-        public bool IsOdd
-        => ID.SumComp().IsOdd();
+        public GridVector GridPosition
+        => ID / 3f;
+        public Vector3 WorldPosition
+        => Grid.GridToWorldPosition(GridPosition);
+
         public IEnumerable<GridVertex> Vertices
         {
             get
             {
-                if (IsEven)
+                yield break;
+
+                /*
+                GridVectorInt directionOffset = Axis.GridDirection().Vector();
+                yield return new((ID - directionOffset) / 2);
+                yield return new((ID + directionOffset) / 2);
+
+                bool isEven = ID.SumXY.IsEven();
+                if (isEven)
                 {
-                    yield return new(ID.Sub(1, 1, 0));
+                    yield return new(ID - new GridVectorInt(1, 1));
                     yield return new(ID.Sub(1, 0, 1));
                     yield return new(ID.Sub(0, 1, 1));
                 }
@@ -40,8 +43,11 @@ namespace Vheos.Games.Prototypes.ShapeTracer
                     yield return new(ID.Sub(0, 1, 0));
                     yield return new(ID.Sub(0, 0, 1));
                 }
+                */
             }
+
         }
+
         public IEnumerable<GridEdge> Edges
         {
             get
@@ -60,29 +66,13 @@ namespace Vheos.Games.Prototypes.ShapeTracer
             }
         }
 
-        // Common
-        public IEnumerable<GridVertex> VerticesSortedByDistanceFrom(Vector3 position, bool descending = false)
-        => descending
-         ? Vertices.OrderByDescending(t => t.Position.DistanceTo(position))
-         : Vertices.OrderBy(t => t.Position.DistanceTo(position));
-        public GridVertex VertexClosestTo(Vector3 position)
-        => VerticesSortedByDistanceFrom(position).First();
-        public GridVertex VertexFarthestFrom(Vector3 position)
-        => VerticesSortedByDistanceFrom(position, true).First();
-
-        // Privates
-        static private bool IsIDValid(Vector3Int id)
-        => id.SumComp().IsEither(1, 2);
-
         // Constructors
-        public GridTriangle(Vector3Int id)
-        => ID = IsIDValid(id) ? id : Grid.InvalidID;
-        public GridTriangle(int idX, int idY, int idZ) : this(new Vector3Int(idX, idY, idZ))
-        { }
+        public GridTriangle(GridVectorInt id)
+        => ID = id;
         public GridTriangle(GridVertex a, GridVertex b, GridVertex c)
         => ID = a.IsAdjacentTo(b) && a.IsAdjacentTo(c)
-            ? new[] { a, b, c }.MaxComps(t => t.ID)
-            : Grid.InvalidID;
+            ? a.ID + b.ID + c.ID
+            : GridVectorInt.Invalid;
 
         // IEquatable
         static public bool operator ==(GridTriangle t, GridTriangle a)
@@ -99,3 +89,24 @@ namespace Vheos.Games.Prototypes.ShapeTracer
         => ID.GetHashCode();
     }
 }
+
+/*
+// Common
+public IEnumerable<GridVertex> VerticesSortedByDistanceFrom(Vector3 position, bool descending = false)
+=> descending
+    ? Vertices.OrderByDescending(t => t.ID.DistanceTo(position))
+    : Vertices.OrderBy(t => t.ID.DistanceTo(position));
+public GridVertex VertexClosestTo(Vector3 position)
+=> VerticesSortedByDistanceFrom(position).First();
+public GridVertex VertexFarthestFrom(Vector3 position)
+=> VerticesSortedByDistanceFrom(position, true).First(); 
+ 
+public GridTriangle(Vector3Int id)
+=> ID = IsIDValid(id) ? id : Grid.InvalidID;
+public GridTriangle(int idX, int idY, int idZ) : this(new Vector3Int(idX, idY, idZ))
+{ }
+public GridTriangle(GridVertex a, GridVertex b, GridVertex c)
+=> ID = a.IsAdjacentTo(b) && a.IsAdjacentTo(c)
+    ? new[] { a, b, c }.MaxComps(t => t.ID)
+    : Grid.InvalidID;
+*/

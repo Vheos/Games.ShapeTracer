@@ -1,4 +1,4 @@
-namespace Vheos.Games.Prototypes.ShapeTracer
+namespace Vheos.Games.ShapeTracer
 {
     using System;
     using System.Linq;
@@ -9,6 +9,7 @@ namespace Vheos.Games.Prototypes.ShapeTracer
     using Tools.Extensions.General;
     using Tools.Extensions.UnityObjects;
     using Tools.Extensions.Math;
+    using TMPro;
 
     [RequireComponent(typeof(Updatable))]
     public class GridDebug : ABaseComponent
@@ -22,42 +23,42 @@ namespace Vheos.Games.Prototypes.ShapeTracer
         [field: SerializeField] public Color ColorZ { get; private set; } = Color.blue;
         [field: SerializeField, Range(1, 10)] public int InstantiateTracerCount { get; private set; }
         [field: SerializeField] public bool InstantiateTracer { get; private set; }
+        [field: SerializeField] public TextMeshProUGUI DebugText { get; private set; }
 
         // Private
         private void Updatable_OnUpdate()
         {
-            if(InstantiateTracer == true)
+            if (InstantiateTracer == true)
             {
                 InstantiateTracer = false;
                 for (int i = 0; i < InstantiateTracerCount; i++)
                     TracerManager.InstantiateComponent();
             }
 
-            Vector3 worldPosition = GlobalCamera.UnityCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue()).NewZ(0);
-            Vector3 gridPosition = Grid.WorldToGridPosition(worldPosition);
-            GridTriangle triangle = Grid.TriangleAt(Space.Grid, gridPosition);
-            GridVertex closestVertex = triangle.VertexClosestTo(gridPosition);
-
-            if (Tracer != null && Anchor != FollowerAnchor.None)
+            if (DebugText != null)
             {
-                Vector3 followerGridPosition = Anchor switch
-                {
-                    FollowerAnchor.None => gridPosition,
-                    FollowerAnchor.Center => triangle.Center,
-                    FollowerAnchor.Vertex => closestVertex.Position,
-                    _ => default,
-                };
-                Tracer.transform.position = Grid.GridToWorldPosition(followerGridPosition);
-            }
+                Vector3 mouseWorldPosition = GlobalCamera.UnityCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue()).NewZ(0);
+                GridVector mouseGridPosition = Grid.WorldToGridPosition(mouseWorldPosition);
+                GridVertex closestVertex = Grid.VertexAt(mouseGridPosition);
+                GridEdge closestEdge = Grid.EdgeAt(mouseGridPosition);
+                GridTriangle closestTriangle = Grid.TriangleAt(mouseGridPosition);
 
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                Debug.Log($"GridPosition: {gridPosition}");
-                Debug.Log($"ID: {triangle.ID}");
-                Debug.Log($"Center: {triangle.Center}");
+                GridVector remainder = mouseGridPosition - mouseGridPosition.AxialRound();
+                DebugText.text = "";
+                DebugText.text += $"{mouseGridPosition}   ->   {mouseGridPosition.AxialRound()}\n\n";
+                DebugText.text += $"{remainder}   ->   {remainder.X.Abs() / (remainder.X.Abs() + remainder.Y.Abs()):F2}\n\n";
+                //DebugText.text += $"{mouseGridPosition * 3}   ->   {(mouseGridPosition + 0.5f).AxialRound()}\n\n";
+
+                /*
+                GridVector vertexSum = GridVector.Zero;
                 Debug.Log($"Vertices:");
-                foreach (var vertex in triangle.Vertices)
-                    Debug.Log($" • {vertex.ID}" + (vertex.Equals(closestVertex) ? "   (closest)" : ""));
+                foreach (var vertex in closestTriangle.Vertices)
+                {
+                    vertexSum += vertex.GridPosition;
+                    Debug.Log($" • {vertex.ID}" + (vertex == closestVertex ? "   (closest)" : ""));
+                }
+                Debug.Log($"Vertex sum: {vertexSum}");
+                */
 
                 /*
                 Debug.Log($"");
@@ -94,9 +95,21 @@ namespace Vheos.Games.Prototypes.ShapeTracer
                 foreach (var neighborTriangle in closestVertex.NeighborTriangles)
                     Debug.Log($" • {neighborTriangle.ID}");
                 */
-
-                Debug.Log($"");
             }
+
+            /*
+            if (Tracer != null && Anchor != FollowerAnchor.None)
+            {
+                GridVector followerGridPosition = Anchor switch
+                {
+                    FollowerAnchor.Cursor => mouseGridPosition,
+                    FollowerAnchor.Center => closestTriangle.GridPosition,
+                    FollowerAnchor.Vertex => closestVertex.GridPosition,
+                    _ => default,
+                };
+                Tracer.transform.position = Grid.GridToWorldPosition(followerGridPosition);
+            }
+            */
         }
 
         // Play
