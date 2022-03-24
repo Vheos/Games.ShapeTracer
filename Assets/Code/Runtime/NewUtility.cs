@@ -148,4 +148,18 @@ namespace Vheos.Games.Prototypes
         }
 #endif
     }
+
+    static public class Axis_Extensions
+    {
+        static public Vector3Int Vector3Int(this Axes t)
+        => new(t.HasFlag(Axes.X).To01(),
+               t.HasFlag(Axes.Y).To01(),
+               t.HasFlag(Axes.Z).To01());
+        static public Vector3 Vector3(this Axes t)
+        => t.Vector3Int();
+        static public Axes SetDirection(ref Axes t, AxisDirection a)
+        => t |= (Axes)a;
+        static public AxisDirection Direction(Axes t)
+        => (AxisDirection)t & AxisDirection.Positive;
+    }
 }
