@@ -12,6 +12,11 @@ namespace Vheos.Games.ShapeTracer
 
     static public class NewUtility
     {
+        static public float InverseLerp(this Vector2 t, Vector2 a, Vector2 b)
+        => (t - a).Dot((b - a).normalized);
+        static public float InverseLerp(this Vector3 t, Vector3 a, Vector3 b)
+        => (t - a).Dot((b - a).normalized);
+
         static public float DecimalPart(this float t)
         => t % 1f;
         static public int IntegralPart(this float t)
