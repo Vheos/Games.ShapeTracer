@@ -99,8 +99,6 @@ namespace Vheos.Games.ShapeTracer
 #endif
     }
 
-
-
     static public class GridVertex_Extensions
     {
         static public GridDirection ToGridDirection(this Axes t, AxisDirection a = AxisDirection.Positive)
