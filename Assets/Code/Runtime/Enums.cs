@@ -1,27 +1,15 @@
 using Vheos.Games.Core;
 
-namespace Vheos.Games.Prototypes.ShapeTracer
+namespace Vheos.Games.ShapeTracer
 {
-    public enum GridType
-    {
-        Triangle,
-        Square,
-    }
-
-    public enum Space
-    {
-        World,
-        Grid,
-    }
-
     public enum GridDirection
     {
         RightDown = Axes.XY | AxisDirection.Positive,
-        Right = Axes.XZ | AxisDirection.Positive,
-        RightUp = Axes.YZ | AxisDirection.Positive,
+        Right = Axes.X | AxisDirection.Positive,
+        RightUp = Axes.Y | AxisDirection.Positive,
         LeftUp = Axes.XY | AxisDirection.Negative,
-        Left = Axes.XZ | AxisDirection.Negative,
-        LeftDown = Axes.YZ | AxisDirection.Negative,
+        Left = Axes.X | AxisDirection.Negative,
+        LeftDown = Axes.Y | AxisDirection.Negative,
 
         DownRight = RightDown,
         UpRight = RightUp,

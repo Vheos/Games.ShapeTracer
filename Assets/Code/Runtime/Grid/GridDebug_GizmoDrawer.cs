@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-namespace Vheos.Games.Prototypes.ShapeTracer.Editor
+namespace Vheos.Games.ShapeTracer.Editor
 {
     using System;
     using System.Linq;
@@ -26,13 +26,7 @@ namespace Vheos.Games.Prototypes.ShapeTracer.Editor
             // Cache
             Vector3 horizontalFrom = LINE_HALF_LENGTH.Append(0, 0);
             Vector3 horizontalTo = LINE_HALF_LENGTH.Neg().Append(0, 0);
-            float diagonalAngle = grid.Type switch
-            {
-                GridType.Triangle => 120f,
-                GridType.Square => 90f,
-                _ => default,
-            };
-            Quaternion diagonalRotation = Quaternion.Euler(0, 0, diagonalAngle);
+            Quaternion diagonalRotation = Quaternion.Euler(0, 0, 120f);
             Vector3 diagonalFrom = horizontalFrom.Rotate(diagonalRotation);
             Vector3 diagonalTo = horizontalTo.Rotate(diagonalRotation);
             float height = 3.Sqrt() / 2f;
@@ -43,19 +37,30 @@ namespace Vheos.Games.Prototypes.ShapeTracer.Editor
             for (int i = -grid.SizeFactor; i <= +grid.SizeFactor; i++)
                 NewUtility.GizmosDrawLine(grid.transform, horizontalFrom.Add(0, i * height, 0), horizontalTo.Add(0, i * height, 0));
 
-            // Diagonal
+            // Diagonal 1
             Gizmos.color = gridDebug.ColorY * opacityColor;
             for (int i = -grid.SizeFactor; i <= +grid.SizeFactor; i++)
                 NewUtility.GizmosDrawLine(grid.transform, diagonalFrom.Add(i, 0, 0), diagonalTo.Add(i, 0, 0));
 
-            // Diagonal (triangle)
-            if (grid.Type == GridType.Triangle)
+            // Diagonal 2
+            diagonalFrom = diagonalFrom.Rotate(diagonalRotation);
+            diagonalTo = diagonalTo.Rotate(diagonalRotation);
+            Gizmos.color = gridDebug.ColorZ * opacityColor;
+            for (int i = -grid.SizeFactor; i <= +grid.SizeFactor; i++)
+                NewUtility.GizmosDrawLine(grid.transform, diagonalFrom.Add(i, 0, 0), diagonalTo.Add(i, 0, 0));
+
+            Gizmos.color = Color.green;
+            for (int ix = -grid.SizeFactor; ix <= +grid.SizeFactor;  ix++)
             {
-                diagonalFrom = diagonalFrom.Rotate(diagonalRotation);
-                diagonalTo = diagonalTo.Rotate(diagonalRotation);
-                Gizmos.color = gridDebug.ColorZ * opacityColor;
-                for (int i = -grid.SizeFactor; i <= +grid.SizeFactor; i++)
-                    NewUtility.GizmosDrawLine(grid.transform, diagonalFrom.Add(i, 0, 0), diagonalTo.Add(i, 0, 0));
+                int fromY = grid.SizeFactor.Neg().ClampMin(-ix - grid.SizeFactor);
+                int toY = grid.SizeFactor.ClampMax( -ix + grid.SizeFactor);
+                for (int iy = fromY; iy <= toY; iy++)
+                {
+                    Vector3 worldPosition = Grid.GridToWorldPosition(new(ix, iy));
+                    if (!Application.isPlaying)
+                        worldPosition = worldPosition.Transform(grid.transform);
+                    //Gizmos.DrawWireSphere(worldPosition, 0.1f);
+                }
             }
         }
     }
