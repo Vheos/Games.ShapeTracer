@@ -19,15 +19,6 @@ namespace Vheos.Games.ShapeTracer
         public Vector3 WorldPosition
         => Grid.GridToWorldPosition(GridPosition);
 
-        public IEnumerable<GridVertex> Vertices
-        {
-            get
-            {
-                GridVectorInt directionOffset = Axis.GridDirection().Vector();
-                yield return new((ID - directionOffset) / 2);
-                yield return new((ID + directionOffset) / 2);
-            }
-        }
         public Axes Axis
         {
             get
@@ -40,9 +31,27 @@ namespace Vheos.Games.ShapeTracer
                 return axis;
             }
         }
+        public IEnumerable<GridVertex> Vertices
+        {
+            get
+            {
+                GridVectorInt directionOffset = Axis.ToGridDirection().ToGridVectorInt();
+                yield return new((ID - directionOffset) / 2);
+                yield return new((ID + directionOffset) / 2);
+            }
+        }
+
+        public IEnumerable<GridVertex> VerticesSortedByDistanceFrom(GridVector gridPosition, bool descending = false)
+        => descending
+         ? Vertices.OrderByDescending(t => t.ID.GridDistanceTo(gridPosition))
+         : Vertices.OrderBy(t => t.ID.GridDistanceTo(gridPosition));
+        public GridVertex VertexClosestTo(GridVector gridPosition)
+        => VerticesSortedByDistanceFrom(gridPosition).First();
+        public GridVertex VertexFarthestFrom(GridVector gridPosition)
+        => VerticesSortedByDistanceFrom(gridPosition, true).First();
 
         // Constructors
-        public GridEdge(GridVectorInt id)
+        internal GridEdge(GridVectorInt id)
         => ID = id;
         public GridEdge(GridVertex a, GridVertex b)
         => ID = a.IsAdjacentTo(b)

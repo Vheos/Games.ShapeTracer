@@ -189,7 +189,8 @@ MonoBehaviour:
   <ColorZ>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
   <InstantiateTracerCount>k__BackingField: 1
   <InstantiateTracer>k__BackingField: 0
-  <DebugText>k__BackingField: {fileID: 2064416646}
+  <DebugLog>k__BackingField: {fileID: 2064416646}
+  <DebugTextPrefab>k__BackingField: {fileID: 8592419217594031038, guid: f10a64d1e0fe24741aa7a7dce14d6d40, type: 3}
 --- !u!114 &351929795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,7 +203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee15c5f8df2af554a9143638e9cb3ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <SizeFactor>k__BackingField: 25
+  <SizeFactor>k__BackingField: 5
 --- !u!1 &464334254
 GameObject:
   m_ObjectHideFlags: 0
@@ -460,7 +461,7 @@ GameObject:
   - component: {fileID: 2064416647}
   - component: {fileID: 2064416646}
   m_Layer: 5
-  m_Name: DebugText
+  m_Name: DebugLog
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -594,10 +595,6 @@ PrefabInstance:
     - target: {fileID: 2924580712062006824, guid: 8a0a3c9a594df6345828a721c6781e78, type: 3}
       propertyPath: m_ClearFlags
       value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2924580712062006824, guid: 8a0a3c9a594df6345828a721c6781e78, type: 3}
-      propertyPath: orthographic size
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2924580712062006825, guid: 8a0a3c9a594df6345828a721c6781e78, type: 3}
       propertyPath: m_RootOrder

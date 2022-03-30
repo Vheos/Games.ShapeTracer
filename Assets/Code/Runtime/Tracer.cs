@@ -27,7 +27,7 @@ namespace Vheos.Games.ShapeTracer
         public GridEdge CurrentEdge
         => new(VertexFrom, VertexTo);
         public float ProgressAlongEdge
-        => VertexFrom.GridPosition.DistanceTo(Grid.WorldToGridPosition(transform.position));
+        => VertexFrom.GridPosition.GridDistanceTo(Grid.WorldToGridPosition(transform.position));
 
         // Privates
         private void Updatable_OnUpdate()

@@ -21,18 +21,25 @@ namespace Vheos.Games.ShapeTracer
         => -X - Y;
 
         // Math
+        public Vector2 XY
+        => this;
+        public Vector3 XYZ
+        => this;
         public float SumXY()
         => X + Y;
+        public GridVector Add(float x, float y)
+        => new(X + x, Y + y);
         public GridVector Abs()
         => new(X.Abs(), Y.Abs());
         public GridVector PosMod(int a)
         => new(X.PosMod(a), Y.PosMod(a));
         public GridVector PosMod(float a)
         => new(X.PosMod(a), Y.PosMod(a));
-        public float DistanceTo(GridVector t)
+        public float GridDistanceTo(GridVectorInt t)
         => (X.DistanceTo(t.X) + Y.DistanceTo(t.Y) + Z.DistanceTo(t.Z)) / 2f;
-        public float DistanceTo(GridVectorInt t)
-        => DistanceTo((GridVector)t);
+        public float GridDistanceTo(GridVector t)
+        => (X.DistanceTo(t.X) + Y.DistanceTo(t.Y) + Z.DistanceTo(t.Z)) / 2f;
+
         public GridVectorInt AxialRound()
         => AxialRound_Internal(t => t.Round());
         public GridVectorInt AxialRoundUp()
@@ -123,10 +130,15 @@ namespace Vheos.Games.ShapeTracer
         public static GridVector operator %(GridVector a, float b)
         => new(a.X % b, a.Y % b);
 
-
         static public implicit operator GridVectorInt(GridVector t)
         => new((int)t.X, (int)t.Y);
+        static public implicit operator Vector2(GridVector t)
+        => new(t.X, t.Y);
         static public implicit operator Vector3(GridVector t)
         => new(t.X, t.Y, t.Z);
+        static public implicit operator GridVector(Vector2 t)
+        => new(t.x, t.y);
+        static public implicit operator GridVector(Vector3 t)
+        => new(t.x, t.y);
     }
 }

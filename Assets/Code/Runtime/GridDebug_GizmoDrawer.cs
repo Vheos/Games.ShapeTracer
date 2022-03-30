@@ -59,7 +59,7 @@ namespace Vheos.Games.ShapeTracer.Editor
                     Vector3 worldPosition = Grid.GridToWorldPosition(new(ix, iy));
                     if (!Application.isPlaying)
                         worldPosition = worldPosition.Transform(grid.transform);
-                    Gizmos.DrawWireSphere(worldPosition, 0.1f);
+                    //Gizmos.DrawWireSphere(worldPosition, 0.1f);
                 }
             }
         }

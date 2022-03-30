@@ -19,8 +19,14 @@ namespace Vheos.Games.ShapeTracer
         => -X - Y;
 
         // Math
+        public Vector2Int XY
+        => this;
+        public Vector3Int XYZ
+        => this;
         public int SumXY()
         => X + Y;
+        public GridVectorInt Add(int x, int y)
+        => new(X + x, Y + y);
         public GridVectorInt Abs()
         => new(X.Abs(), Y.Abs());
         public GridVectorInt PosMod(int a)
@@ -100,8 +106,14 @@ namespace Vheos.Games.ShapeTracer
 
         static public implicit operator GridVector(GridVectorInt t)
         => new(t.X, t.Y);
+        static public implicit operator Vector2Int(GridVectorInt t)
+        => new(t.X, t.Y);
         static public implicit operator Vector3Int(GridVectorInt t)
         => new(t.X, t.Y, t.Z);
+        static public implicit operator GridVectorInt(Vector2Int t)
+        => new(t.x, t.y);
+        static public implicit operator GridVectorInt(Vector3Int t)
+        => new(t.x, t.y);
 
         // IEquatable
         static public bool operator ==(GridVectorInt t, GridVectorInt a)

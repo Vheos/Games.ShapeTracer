@@ -23,12 +23,11 @@ namespace Vheos.Games.ShapeTracer
         {
             get
             {
-                foreach (var direction in Grid.GridDirectionsAndVectors.Keys)
-                    yield return GetVertex(direction);
+                foreach (var offset in Grid.GridDirectionsAndVectors.Values)
+                    yield return new(ID + offset);
             }
         }
-        public GridVertex GetVertex(GridDirection direction)
-        => new(ID + direction.Vector());
+
         public bool IsAdjacentTo(GridVertex vertex)
         => ID.GridDistanceTo(vertex.ID) == 1;
 

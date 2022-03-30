@@ -105,11 +105,15 @@ namespace Vheos.Games.ShapeTracer
         static public GridVertex VertexAt(Vector3 worldPosition)
         => VertexAt(WorldToGridPosition(worldPosition));
         static public GridEdge EdgeAt(GridVector gridPosition)
-        => new((gridPosition * 2 ).AxialRound());
+        => default;
         static public GridEdge EdgeAt(Vector3 worldPosition)
         => EdgeAt(WorldToGridPosition(worldPosition));
         static public GridTriangle TriangleAt(GridVector gridPosition)
-        => new((gridPosition * 3).AxialRound());
+        {
+            Vector3Int roundedGridPosition = gridPosition.XYZ.RoundUp();
+            int isOdd = roundedGridPosition.CompSum().Mod(2);
+            return new(roundedGridPosition.XY().Mul(3).Sub(2).Add(isOdd));
+        }
         static public GridTriangle TriangleAt(Vector3 worldPosition)
         => TriangleAt(WorldToGridPosition(worldPosition));
 
@@ -127,9 +131,6 @@ namespace Vheos.Games.ShapeTracer
         {
             GetTraceInfo(edge).Disconnect();
         }
-
-
-
         static private void Tracer_OnStartTracingEdge(Tracer tracer, GridEdge edge)
         {
             if (GetTraceInfo(edge).State == TraceState.None)
@@ -142,7 +143,7 @@ namespace Vheos.Games.ShapeTracer
             base.PlayAwake();
             _GridDirectionsAndVectors = new();
             foreach (var direction in NewUtility.GetEnumValues<GridDirection>(true, true))
-                _GridDirectionsAndVectors.Add(direction, direction.Vector());
+                _GridDirectionsAndVectors.Add(direction, direction.ToGridVectorInt());
 
             _infosByEdge = new();
         }

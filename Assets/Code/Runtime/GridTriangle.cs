@@ -19,55 +19,58 @@ namespace Vheos.Games.ShapeTracer
         public Vector3 WorldPosition
         => Grid.GridToWorldPosition(GridPosition);
 
+        public bool IsEven
+        => ID.SumXY().PosMod(3) == 2;
         public IEnumerable<GridVertex> Vertices
         {
             get
             {
-                yield break;
-
-                /*
-                GridVectorInt directionOffset = Axis.GridDirection().Vector();
-                yield return new((ID - directionOffset) / 2);
-                yield return new((ID + directionOffset) / 2);
-
-                bool isEven = ID.SumXY.IsEven();
-                if (isEven)
-                {
-                    yield return new(ID - new GridVectorInt(1, 1));
-                    yield return new(ID.Sub(1, 0, 1));
-                    yield return new(ID.Sub(0, 1, 1));
-                }
-                else
-                {
-                    yield return new(ID.Sub(1, 0, 0));
-                    yield return new(ID.Sub(0, 1, 0));
-                    yield return new(ID.Sub(0, 0, 1));
-                }
-                */
+                foreach (var offset in GetRawTriangleOffsets(IsEven))
+                    yield return new((ID + offset) / 3);
             }
-
         }
-
         public IEnumerable<GridEdge> Edges
         {
             get
             {
                 GridVertex[] vertices = Vertices.ToArray();
-                yield return new(vertices[0], vertices[1]);
-                yield return new(vertices[1], vertices[2]);
-                yield return new(vertices[2], vertices[0]);
+                yield return new(vertices[0].ID + vertices[1].ID);
+                yield return new(vertices[1].ID + vertices[2].ID);
+                yield return new(vertices[2].ID + vertices[0].ID);
             }
         }
         public IEnumerable<GridTriangle> NeighborTriangles
         {
             get
             {
-                yield break;
+                foreach (var offset in GetRawTriangleOffsets(!IsEven))
+                    yield return new(ID + offset);
             }
         }
 
+        public IEnumerable<GridVertex> VerticesSortedByDistanceFrom(GridVector gridPosition, bool descending = false)
+        => descending
+         ? Vertices.OrderByDescending(t => t.ID.GridDistanceTo(gridPosition))
+         : Vertices.OrderBy(t => t.ID.GridDistanceTo(gridPosition));
+        public GridVertex VertexClosestTo(GridVector gridPosition)
+        => VerticesSortedByDistanceFrom(gridPosition).First();
+        public GridVertex VertexFarthestFrom(GridVector gridPosition)
+        => VerticesSortedByDistanceFrom(gridPosition, true).First();
+
+        public bool IsAdjacent(GridTriangle triangle)
+        => ID.GridDistanceTo(triangle.ID) == 2;
+
+        // Privates
+        static private IEnumerable<GridVectorInt> GetRawTriangleOffsets(bool isEven)
+        {
+            int sign = isEven.ToSign();
+            yield return new GridVectorInt(-1, -1) * sign;
+            yield return new GridVectorInt(+2, -1) * sign;
+            yield return new GridVectorInt(-1, +2) * sign;
+        }
+
         // Constructors
-        public GridTriangle(GridVectorInt id)
+        internal GridTriangle(GridVectorInt id)
         => ID = id;
         public GridTriangle(GridVertex a, GridVertex b, GridVertex c)
         => ID = a.IsAdjacentTo(b) && a.IsAdjacentTo(c)
