@@ -43,8 +43,8 @@ namespace Vheos.Games.ShapeTracer
 
         public IEnumerable<GridVertex> VerticesSortedByDistanceFrom(GridVector gridPosition, bool descending = false)
         => descending
-         ? Vertices.OrderByDescending(t => t.ID.GridDistanceTo(gridPosition))
-         : Vertices.OrderBy(t => t.ID.GridDistanceTo(gridPosition));
+         ? Vertices.OrderByDescending(t => t.ID.DistanceTo(gridPosition))
+         : Vertices.OrderBy(t => t.ID.DistanceTo(gridPosition));
         public GridVertex VertexClosestTo(GridVector gridPosition)
         => VerticesSortedByDistanceFrom(gridPosition).First();
         public GridVertex VertexFarthestFrom(GridVector gridPosition)

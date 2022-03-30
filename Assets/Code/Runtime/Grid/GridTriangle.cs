@@ -20,7 +20,7 @@ namespace Vheos.Games.ShapeTracer
         => Grid.GridToWorldPosition(GridPosition);
 
         public bool IsEven
-        => ID.SumXY().PosMod(3) == 2;
+        => ID.XY.CompSum().PosMod(3) == 2;
         public IEnumerable<GridVertex> Vertices
         {
             get
@@ -50,15 +50,15 @@ namespace Vheos.Games.ShapeTracer
 
         public IEnumerable<GridVertex> VerticesSortedByDistanceFrom(GridVector gridPosition, bool descending = false)
         => descending
-         ? Vertices.OrderByDescending(t => t.ID.GridDistanceTo(gridPosition))
-         : Vertices.OrderBy(t => t.ID.GridDistanceTo(gridPosition));
+         ? Vertices.OrderByDescending(t => t.ID.DistanceTo(gridPosition))
+         : Vertices.OrderBy(t => t.ID.DistanceTo(gridPosition));
         public GridVertex VertexClosestTo(GridVector gridPosition)
         => VerticesSortedByDistanceFrom(gridPosition).First();
         public GridVertex VertexFarthestFrom(GridVector gridPosition)
         => VerticesSortedByDistanceFrom(gridPosition, true).First();
 
         public bool IsAdjacent(GridTriangle triangle)
-        => ID.GridDistanceTo(triangle.ID) == 2;
+        => ID.DistanceTo(triangle.ID) == 2;
 
         // Privates
         static private IEnumerable<GridVectorInt> GetRawTriangleOffsets(bool isEven)
