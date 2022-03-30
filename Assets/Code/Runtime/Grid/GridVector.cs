@@ -7,10 +7,6 @@ namespace Vheos.Games.ShapeTracer
     using Tools.Extensions.General;
     using Tools.Extensions.UnityObjects;
     using Tools.Extensions.Math;
-    using Vheos.Tools.Utilities;
-    using Vheos.Tools.Extensions.Collections;
-
-
 
     public struct GridVector
     {
@@ -25,36 +21,25 @@ namespace Vheos.Games.ShapeTracer
         => this;
         public Vector3 XYZ
         => this;
-        public float SumXY()
-        => X + Y;
-        public GridVector Add(float x, float y)
-        => new(X + x, Y + y);
-        public GridVector Abs()
-        => new(X.Abs(), Y.Abs());
+        public float Length
+        => XYZ.Abs().CompSum() / 2f;
+        public GridVector Normalized
+        => this / Length;
+        public float Dot(GridVectorInt a)
+        => XYZ.Mul(a.XYZ).CompSum();
+        public float Dot(GridVector a)
+        => XYZ.Mul(a.XYZ).CompSum();
         public GridVector PosMod(int a)
         => new(X.PosMod(a), Y.PosMod(a));
         public GridVector PosMod(float a)
         => new(X.PosMod(a), Y.PosMod(a));
-        public float GridDistanceTo(GridVectorInt t)
-        => (X.DistanceTo(t.X) + Y.DistanceTo(t.Y) + Z.DistanceTo(t.Z)) / 2f;
-        public float GridDistanceTo(GridVector t)
-        => (X.DistanceTo(t.X) + Y.DistanceTo(t.Y) + Z.DistanceTo(t.Z)) / 2f;
-
+        public float DistanceTo(GridVectorInt a)
+        => (this - a).Length;
+        public float DistanceTo(GridVector a)
+        => (this - a).Length;
         public GridVectorInt AxialRound()
-        => AxialRound_Internal(t => t.Round());
-        public GridVectorInt AxialRoundUp()
-        => AxialRound_Internal(t => t.RoundUp());
-        public GridVectorInt AxialRoundDown()
-        => AxialRound_Internal(t => t.RoundDown());
-        public GridVectorInt AxialRoundAwayFromZero()
-        => AxialRound_Internal(t => t.RoundAwayFromZero());
-        public GridVectorInt AxialRoundTowardsZero()
-        => AxialRound_Internal(t => t.RoundTowardsZero());
-
-        // Privates
-        public GridVectorInt AxialRound_Internal(Func<float, int> roundingFunc)
         {
-            Vector3Int rounded = new(roundingFunc(X), roundingFunc(Y), roundingFunc(Z));
+            Vector3Int rounded = XYZ.Round();
             return ((Vector3)this - rounded).Abs().MaxCompAxis() switch
             {
                 Axes.X => FromYZ(rounded.y, rounded.z),
@@ -108,6 +93,17 @@ namespace Vheos.Games.ShapeTracer
         public static GridVector operator %(GridVector a, int b)
         => new(a.X % b, a.Y % b);
 
+        public static GridVector operator +(int a, GridVector b)
+        => new(b.X + a, b.Y + a);
+        public static GridVector operator -(int a, GridVector b)
+        => new(b.X - a, b.Y - a);
+        public static GridVector operator *(int a, GridVector b)
+        => new(b.X * a, b.Y * a);
+        public static GridVector operator /(int a, GridVector b)
+        => new(b.X / a, b.Y / a);
+        public static GridVector operator %(int a, GridVector b)
+        => new(b.X % a, b.Y % a);
+
         public static GridVector operator +(GridVector a, GridVector b)
         => new(a.X + b.X, a.Y + b.Y);
         public static GridVector operator -(GridVector a, GridVector b)
@@ -129,6 +125,17 @@ namespace Vheos.Games.ShapeTracer
         => new(a.X / b, a.Y / b);
         public static GridVector operator %(GridVector a, float b)
         => new(a.X % b, a.Y % b);
+
+        public static GridVector operator +(float a, GridVector b)
+        => new(b.X + a, b.Y + a);
+        public static GridVector operator -(float a, GridVector b)
+        => new(b.X - a, b.Y - a);
+        public static GridVector operator *(float a, GridVector b)
+        => new(b.X * a, b.Y * a);
+        public static GridVector operator /(float a, GridVector b)
+        => new(b.X / a, b.Y / a);
+        public static GridVector operator %(float a, GridVector b)
+        => new(b.X % a, b.Y % a);
 
         static public implicit operator GridVectorInt(GridVector t)
         => new((int)t.X, (int)t.Y);

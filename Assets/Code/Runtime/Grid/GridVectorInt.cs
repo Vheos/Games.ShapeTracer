@@ -8,8 +8,6 @@ namespace Vheos.Games.ShapeTracer
     using Tools.Extensions.UnityObjects;
     using Tools.Extensions.Math;
 
-
-
     public struct GridVectorInt : IEquatable<GridVectorInt>
     {
         // Fields
@@ -23,20 +21,22 @@ namespace Vheos.Games.ShapeTracer
         => this;
         public Vector3Int XYZ
         => this;
-        public int SumXY()
-        => X + Y;
-        public GridVectorInt Add(int x, int y)
-        => new(X + x, Y + y);
-        public GridVectorInt Abs()
-        => new(X.Abs(), Y.Abs());
+        public int Length
+        => XYZ.Abs().CompSum() / 2;
+        public GridVector Normalized
+        => this / Length;
+        public int Dot(GridVectorInt a)
+        => XYZ.Mul(a.XYZ).CompSum();
+        public float Dot(GridVector a)
+        => XYZ.Mul(a.XYZ).CompSum();
         public GridVectorInt PosMod(int a)
         => new(X.PosMod(a), Y.PosMod(a));
         public GridVector PosMod(float a)
         => new(X.PosMod(a), Y.PosMod(a));
-        public int GridDistanceTo(GridVectorInt a)
-        => (X.DistanceTo(a.X) + Y.DistanceTo(a.Y) + Z.DistanceTo(a.Z)) / 2;
-        public float GridDistanceTo(GridVector a)
-        => (X.DistanceTo(a.X) + Y.DistanceTo(a.Y) + Z.DistanceTo(a.Z)) / 2f;
+        public int DistanceTo(GridVectorInt a)
+        => (this - a).Length;
+        public float DistanceTo(GridVector a)
+        => (this - a).Length;
 
         // Initializers
         public GridVectorInt(int x, int y)
@@ -82,6 +82,17 @@ namespace Vheos.Games.ShapeTracer
         public static GridVectorInt operator %(GridVectorInt a, int b)
         => new(a.X % b, a.Y % b);
 
+        public static GridVectorInt operator +(int a, GridVectorInt b)
+        => new(b.X + a, b.Y + a);
+        public static GridVectorInt operator -(int a, GridVectorInt b)
+        => new(b.X - a, b.Y - a);
+        public static GridVectorInt operator *(int a, GridVectorInt b)
+        => new(b.X * a, b.Y * a);
+        public static GridVectorInt operator /(int a, GridVectorInt b)
+        => new(b.X / a, b.Y / a);
+        public static GridVectorInt operator %(int a, GridVectorInt b)
+        => new(b.X % a, b.Y % a);
+
         public static GridVector operator +(GridVectorInt a, GridVector b)
         => new(a.X + b.X, a.Y + b.Y);
         public static GridVector operator -(GridVectorInt a, GridVector b)
@@ -103,6 +114,17 @@ namespace Vheos.Games.ShapeTracer
         => new(a.X / b, a.Y / b);
         public static GridVector operator %(GridVectorInt a, float b)
         => new(a.X % b, a.Y % b);
+
+        public static GridVector operator +(float a, GridVectorInt b)
+        => new(b.X + a, b.Y + a);
+        public static GridVector operator -(float a, GridVectorInt b)
+        => new(b.X - a, b.Y - a);
+        public static GridVector operator *(float a, GridVectorInt b)
+        => new(b.X * a, b.Y * a);
+        public static GridVector operator /(float a, GridVectorInt b)
+        => new(b.X / a, b.Y / a);
+        public static GridVector operator %(float a, GridVectorInt b)
+        => new(b.X % a, b.Y % a);
 
         static public implicit operator GridVector(GridVectorInt t)
         => new(t.X, t.Y);
