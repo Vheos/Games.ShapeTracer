@@ -27,9 +27,17 @@ namespace Vheos.Games.ShapeTracer
                     yield return new(ID + offset);
             }
         }
+        public IEnumerable<GridEdge> NeighborEdges
+        {
+            get
+            {
+                foreach (var vertex in NeighborVertices)
+                    yield return new(ID + vertex.ID);
+            }
+        }
 
         public bool IsAdjacentTo(GridVertex vertex)
-        => ID.GridDistanceTo(vertex.ID) == 1;
+        => ID.DistanceTo(vertex.ID) == 1;
 
         // Constructors
         public GridVertex(GridVectorInt id)
