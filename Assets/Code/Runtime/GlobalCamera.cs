@@ -48,14 +48,6 @@ namespace Vheos.Games.ShapeTracer
             UnityCamera = Get<Camera>();
 
             Get<Updatable>().OnUpdate.SubEnableDisable(this, HandleScreenEdgeMovement);
-
-        }
-
-        // Defines
-        public enum ScreenEdgeThresholdUnit
-        {
-            Percent,
-            Pixels,
         }
     }
 }
