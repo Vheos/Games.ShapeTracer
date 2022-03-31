@@ -34,26 +34,26 @@ namespace Vheos.Games.ShapeTracer.Editor
 
             // Horizontal
             Gizmos.color = gridDebug.ColorX * opacityColor;
-            for (int i = -grid.SizeFactor; i <= +grid.SizeFactor; i++)
+            for (int i = -grid.Radius; i <= +grid.Radius; i++)
                 NewUtility.GizmosDrawLine(grid.transform, horizontalFrom.Add(0, i * height, 0), horizontalTo.Add(0, i * height, 0));
 
             // Diagonal 1
             Gizmos.color = gridDebug.ColorY * opacityColor;
-            for (int i = -grid.SizeFactor; i <= +grid.SizeFactor; i++)
+            for (int i = -grid.Radius; i <= +grid.Radius; i++)
                 NewUtility.GizmosDrawLine(grid.transform, diagonalFrom.Add(i, 0, 0), diagonalTo.Add(i, 0, 0));
 
             // Diagonal 2
             diagonalFrom = diagonalFrom.Rotate(diagonalRotation);
             diagonalTo = diagonalTo.Rotate(diagonalRotation);
             Gizmos.color = gridDebug.ColorZ * opacityColor;
-            for (int i = -grid.SizeFactor; i <= +grid.SizeFactor; i++)
+            for (int i = -grid.Radius; i <= +grid.Radius; i++)
                 NewUtility.GizmosDrawLine(grid.transform, diagonalFrom.Add(i, 0, 0), diagonalTo.Add(i, 0, 0));
 
             Gizmos.color = Color.green;
-            for (int ix = -grid.SizeFactor; ix <= +grid.SizeFactor;  ix++)
+            for (int ix = -grid.Radius; ix <= +grid.Radius;  ix++)
             {
-                int fromY = grid.SizeFactor.Neg().ClampMin(-ix - grid.SizeFactor);
-                int toY = grid.SizeFactor.ClampMax( -ix + grid.SizeFactor);
+                int fromY = grid.Radius.Neg().ClampMin(-ix - grid.Radius);
+                int toY = grid.Radius.ClampMax( -ix + grid.Radius);
                 for (int iy = fromY; iy <= toY; iy++)
                 {
                     Vector3 worldPosition = Grid.GridToWorldPosition(new(ix, iy));

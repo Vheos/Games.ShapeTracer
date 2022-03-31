@@ -66,14 +66,14 @@ namespace Vheos.Games.ShapeTracer
 
                 Debug.Log($"Triangle: {closestTriangle.ID}");
                 Debug.Log($"Vertices:");
-                foreach (var vertex in closestTriangle.Vertices.ToArray())
+                foreach (var vertex in closestTriangle.Vertices)
                 {
                     Debug.Log($" • {vertex.ID}");
                     Debug.DrawLine(mouseWorldPosition, vertex.WorldPosition, Color.red, 1f);
                 }
 
                 Debug.Log($"Edges:");
-                foreach (var edge in closestTriangle.Edges.ToArray())
+                foreach (var edge in closestTriangle.Edges)
                 {
                     GridVertex[] edgeVertices = edge.Vertices.ToArray();
                     Debug.Log($" • {edge.ID}   =   {edgeVertices[0].ID}   +   {edgeVertices[1].ID}");
@@ -81,12 +81,17 @@ namespace Vheos.Games.ShapeTracer
                 }
 
                 Debug.Log($"Triangles:");
-                foreach (var triangle in closestTriangle.NeighborTriangles.ToArray())
+                foreach (var triangle in closestTriangle.NeighborTriangles)
                 {
-                    Debug.Log($" • {triangle.ID}   /   {triangle.GridPosition.GridDistanceTo(closestTriangle.GridPosition)}");
+                    Debug.Log($" • {triangle.ID}   /   {triangle.GridPosition.DistanceTo(closestTriangle.GridPosition)}");
                     Debug.DrawLine(mouseWorldPosition, triangle.WorldPosition, Color.blue, 1f);
                 }
                 Debug.Log($"");
+
+                foreach (var triangle in closestTriangle.Edges.First().NeighborTriangles)
+                {
+                    Debug.DrawLine(mouseWorldPosition, triangle.WorldPosition, Color.magenta, 1f);
+                }
 
                 /* triangle from 3x vertex
                 Debug.Log($"");
@@ -135,10 +140,10 @@ namespace Vheos.Games.ShapeTracer
             Get<Updatable>().OnUpdate.SubEnableDisable(this, Updatable_OnUpdate);
 
             Grid grid = Get<Grid>();
-            for (int ix = -grid.SizeFactor; ix <= +grid.SizeFactor; ix++)
+            for (int ix = -grid.Radius; ix <= +grid.Radius; ix++)
             {
-                int fromY = grid.SizeFactor.Neg().ClampMin(-ix - grid.SizeFactor);
-                int toY = grid.SizeFactor.ClampMax(-ix + grid.SizeFactor);
+                int fromY = grid.Radius.Neg().ClampMin(-ix - grid.Radius);
+                int toY = grid.Radius.ClampMax(-ix + grid.Radius);
                 for (int iy = fromY; iy <= toY; iy++)
                 {
                     TextMeshPro vertexText = Instantiate(DebugTextPrefab);

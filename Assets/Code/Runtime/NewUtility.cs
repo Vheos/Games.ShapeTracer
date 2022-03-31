@@ -12,6 +12,49 @@ namespace Vheos.Games.ShapeTracer
 
     static public class NewUtility
     {
+        static public void Activate(this Component t)
+        => t.gameObject.SetActive(true);
+        static public void Deactivate(this Component t)
+        => t.gameObject.SetActive(false);
+        static public void Enable(this MonoBehaviour t)
+        => t.enabled = true;
+        static public void Disable(this MonoBehaviour t)
+        => t.enabled = false;
+
+        static public bool IsFullyTraced(this GridEdge t)
+        => t.TraceInfo().State == TraceState.Full;
+        static public bool IsFullyTraced(this GridTriangle t)
+        {
+            foreach (var edge in t.Edges)
+                if (!edge.IsFullyTraced())
+                    return false;
+            return true;
+        }
+        static public EdgeTraceInfo TraceInfo(this GridEdge t)
+        => Grid.GetTraceInfo(t);
+        static public GridDirection ToGridDirection(this Axes t, AxisDirection a = AxisDirection.Positive)
+        => t switch
+        {
+            Axes.XY when a == AxisDirection.Positive => GridDirection.RightDown,
+            Axes.X when a == AxisDirection.Positive => GridDirection.Right,
+            Axes.Y when a == AxisDirection.Positive => GridDirection.RightUp,
+            Axes.XY when a == AxisDirection.Negative => GridDirection.LeftUp,
+            Axes.X when a == AxisDirection.Negative => GridDirection.Left,
+            Axes.Y when a == AxisDirection.Negative => GridDirection.LeftDown,
+            _ => GridDirection.Invalid,
+        };
+        static public GridVectorInt ToGridVectorInt(this GridDirection t)
+        => t switch
+        {
+            GridDirection.RightUp => new(0, +1),
+            GridDirection.Right => new(+1, 0),
+            GridDirection.RightDown => new(+1, -1),
+            GridDirection.LeftDown => new(0, -1),
+            GridDirection.Left => new(-1, 0),
+            GridDirection.LeftUp => new(-1, +1),
+            _ => GridVectorInt.Invalid,
+        };
+
         static public float InverseLerp(this Vector2 t, Vector2 a, Vector2 b)
         => (t - a).Dot((b - a).normalized);
         static public float InverseLerp(this Vector3 t, Vector3 a, Vector3 b)
@@ -98,57 +141,33 @@ namespace Vheos.Games.ShapeTracer
         }
 #endif
     }
-
-    static public class GridVertex_Extensions
-    {
-        static public GridDirection ToGridDirection(this Axes t, AxisDirection a = AxisDirection.Positive)
-        => t switch
-        {
-            Axes.XY when a == AxisDirection.Positive => GridDirection.RightDown,
-            Axes.X when a == AxisDirection.Positive => GridDirection.Right,
-            Axes.Y when a == AxisDirection.Positive => GridDirection.RightUp,
-            Axes.XY when a == AxisDirection.Negative => GridDirection.LeftUp,
-            Axes.X when a == AxisDirection.Negative => GridDirection.Left,
-            Axes.Y when a == AxisDirection.Negative => GridDirection.LeftDown,
-            _ => GridDirection.Invalid,
-        };
-        static public GridVectorInt ToGridVectorInt(this GridDirection t)
-        => t switch
-        {
-            GridDirection.RightUp => new(0, +1),
-            GridDirection.Right => new(+1, 0),
-            GridDirection.RightDown => new(+1, -1),
-            GridDirection.LeftDown => new(0, -1),
-            GridDirection.Left => new(-1, 0),
-            GridDirection.LeftUp => new(-1, +1),
-            _ => GridVectorInt.Invalid,
-        };
-        static public Vector3Int VectorInt(this TriangleDirection t)
-        => t switch
-        {
-            TriangleDirection.RightDown => new(+1, 00, 00),
-            TriangleDirection.RightUp => new(+1, +1, 00),
-            TriangleDirection.Up => new(00, +1, 00),
-            TriangleDirection.LeftUp => new(00, +1, +1),
-            TriangleDirection.LeftDown => new(00, 00, +1),
-            TriangleDirection.Down => new(+1, 00, +1),
-            _ => default,
-        };
-        static public Vector3 Vector(this TriangleDirection t)
-        => t.VectorInt();
-    }
-
-    static public class Axis_Extensions
-    {
-        static public Vector3Int Vector3Int(this Axes t)
-        => new(t.HasFlag(Axes.X).To01(),
-               t.HasFlag(Axes.Y).To01(),
-               t.HasFlag(Axes.Z).To01());
-        static public Vector3 Vector3(this Axes t)
-        => t.Vector3Int();
-        static public Axes SetDirection(ref Axes t, AxisDirection a)
-        => t |= (Axes)a;
-        static public AxisDirection Direction(Axes t)
-        => (AxisDirection)t & AxisDirection.Positive;
-    }
 }
+
+/*
+
+static public Vector3Int VectorInt(this TriangleDirection t)
+=> t switch
+{
+    TriangleDirection.RightDown => new(+1, 00, 00),
+    TriangleDirection.RightUp => new(+1, +1, 00),
+    TriangleDirection.Up => new(00, +1, 00),
+    TriangleDirection.LeftUp => new(00, +1, +1),
+    TriangleDirection.LeftDown => new(00, 00, +1),
+    TriangleDirection.Down => new(+1, 00, +1),
+    _ => default,
+};
+static public Vector3 Vector(this TriangleDirection t)
+=> t.VectorInt();
+
+static public class Axis_Extensions
+{
+    static public Vector3Int Vector3Int(this Axes t)
+    => new(t.HasFlag(Axes.X).To01(),
+           t.HasFlag(Axes.Y).To01(),
+           t.HasFlag(Axes.Z).To01());
+    static public Axes SetDirection(ref Axes t, AxisDirection a)
+    => t |= (Axes)a;
+    static public AxisDirection Direction(Axes t)
+    => (AxisDirection)t & AxisDirection.Positive;
+}
+*/
