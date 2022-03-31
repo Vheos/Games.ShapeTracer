@@ -35,7 +35,19 @@ namespace Vheos.Games.ShapeTracer
                     yield return new(ID + vertex.ID);
             }
         }
-
+        public IEnumerable<GridTriangle> NeighborTriangles
+        {
+            get
+            {
+                GridVertex[] vertices = NeighborVertices.ToArray();
+                yield return new(ID + vertices[0].ID + vertices[1].ID);
+                yield return new(ID + vertices[1].ID + vertices[2].ID);
+                yield return new(ID + vertices[2].ID + vertices[3].ID);
+                yield return new(ID + vertices[3].ID + vertices[4].ID);
+                yield return new(ID + vertices[4].ID + vertices[5].ID);
+                yield return new(ID + vertices[5].ID + vertices[0].ID);
+            }
+        }
         public bool IsAdjacentTo(GridVertex vertex)
         => ID.DistanceTo(vertex.ID) == 1;
 
@@ -62,38 +74,3 @@ namespace Vheos.Games.ShapeTracer
         => ID.GetHashCode();
     }
 }
-
-
-
-/*
-public IEnumerable<GridEdge> NeighborEdges
-{
-    get
-    {
-        foreach (var vertex in NeighborVertices)
-            yield return new(this, vertex);
-    }
-}
-public IEnumerable<GridTriangle> NeighborTriangles
-{
-    get
-    {
-        foreach (var direction in NewUtility.GetEnumValues<TriangleDirection>(true, true))
-            yield return GetTriangle(direction);
-    }
-}
-
-public GridEdge GetEdge(TriangleDirection direction)
-=> default;
-public GridTriangle GetTriangle(TriangleDirection direction)
-=> default;
-
-public GridDirection DirectionTowards(GridVertex vertex)
-{
-    return default; // WIP
-}
-public TriangleDirection DirectionTowards(GridTriangle triangle)
-{
-    return default; // WIP
-}
-*/
