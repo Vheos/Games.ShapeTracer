@@ -2,6 +2,14 @@ using Vheos.Games.Core;
 
 namespace Vheos.Games.ShapeTracer
 {
+
+    public enum TraceState
+    {
+        None,
+        Partial,
+        Full,
+    }
+
     public enum GridDirection
     {
         RightDown = Axes.XY | AxisDirection.Positive,
