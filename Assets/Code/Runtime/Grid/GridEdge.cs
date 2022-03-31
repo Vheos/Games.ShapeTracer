@@ -40,6 +40,16 @@ namespace Vheos.Games.ShapeTracer
                 yield return new((ID + directionOffset) / 2);
             }
         }
+        public IEnumerable<GridTriangle> NeighborTriangles
+        {
+            get
+            {
+                GridVectorInt directionOffset = Axis.ToGridDirection().ToGridVectorInt();
+                GridVectorInt firstVertexID = (ID - directionOffset) / 2;
+                yield return new(ID + firstVertexID + directionOffset.RotateCW());
+                yield return new(ID + firstVertexID + directionOffset.RotateCCW());
+            }
+        }
 
         public IEnumerable<GridVertex> VerticesSortedByDistanceFrom(GridVector gridPosition, bool descending = false)
         => descending
@@ -75,15 +85,3 @@ namespace Vheos.Games.ShapeTracer
         => ID.GetHashCode();
     }
 }
-
-/*
-// Common
-public IEnumerable<GridVertex> VerticesSortedByDistanceFrom(Vector3 position, bool descending = false)
-=> descending
- ? Vertices.OrderByDescending(t => t.ID.DistanceTo(position))
- : Vertices.OrderBy(t => t.ID.DistanceTo(position));
-public GridVertex VertexClosestTo(Vector3 position)
-=> VerticesSortedByDistanceFrom(position).First();
-public GridVertex VertexFarthestFrom(Vector3 position)
-=> VerticesSortedByDistanceFrom(position, true).First();
-*/
