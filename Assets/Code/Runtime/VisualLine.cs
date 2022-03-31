@@ -8,7 +8,6 @@ namespace Vheos.Games.ShapeTracer
     using Tools.Extensions.General;
     using Tools.Extensions.UnityObjects;
     using Tools.Extensions.Math;
-    using UnityEngine.Pool;
 
     [RequireComponent(typeof(LineRenderer))]
     public class VisualLine : ABaseComponent
@@ -34,6 +33,36 @@ namespace Vheos.Games.ShapeTracer
             get => To.Transform(transform);
             set => To = value.Untransform(transform);
         }
+        public Color ColorFrom
+        {
+            get => _lineRenderer.startColor;
+            set => _lineRenderer.startColor = value;
+        }
+        public Color ColorTo
+        {
+            get => _lineRenderer.endColor;
+            set => _lineRenderer.endColor = value;
+        }
+        public Color RGBFrom
+        {
+            get => _lineRenderer.startColor.NewA(1f);
+            set => _lineRenderer.startColor = value.NewA(AlphaFrom);
+        }
+        public Color RGBTo
+        {
+            get => _lineRenderer.endColor.NewA(1f);
+            set => _lineRenderer.endColor = value.NewA(AlphaTo);
+        }
+        public float AlphaFrom
+        {
+            get => _lineRenderer.startColor.a;
+            set => _lineRenderer.startColor = _lineRenderer.startColor.NewA(value);
+        }
+        public float AlphaTo
+        {
+            get => _lineRenderer.endColor.a;
+            set => _lineRenderer.endColor = _lineRenderer.startColor.NewA(value);
+        }
 
         // Privates
         private LineRenderer _lineRenderer;
@@ -43,7 +72,6 @@ namespace Vheos.Games.ShapeTracer
         {
             base.PlayAwake();
             _lineRenderer = Get<LineRenderer>();
-
         }
     }
 }
