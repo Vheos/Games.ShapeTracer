@@ -8,8 +8,7 @@ namespace Vheos.Games.ShapeTracer
     using Tools.Extensions.General;
     using Tools.Extensions.UnityObjects;
     using Tools.Extensions.Math;
-    using Random = UnityEngine.Random;
-    using Vheos.Tools.Utilities;
+    using Tools.Utilities;
 
     [RequireComponent(typeof(Updatable))]
     public class Tracer : ABaseComponent
@@ -19,7 +18,7 @@ namespace Vheos.Games.ShapeTracer
 
         // Events
         public AutoEvent<Tracer, GridEdge> OnStartTracingEdge = new();
-        public AutoEvent<Tracer, GridEdge> OnFinishTracingEdge = new();
+        public AutoEvent<Tracer, GridEdge> OnStopTracingEdge = new();
 
         // Publics
         public GridVertex VertexFrom;
@@ -42,7 +41,7 @@ namespace Vheos.Games.ShapeTracer
             // Check if arrived at target vertex
             if (ProgressAlongEdge >= 1f)
             {
-                OnFinishTracingEdge.Invoke(this, CurrentEdge);
+                OnStopTracingEdge.Invoke(this, CurrentEdge);
                 UpdateTargetVertex();
             }
 
@@ -57,11 +56,10 @@ namespace Vheos.Games.ShapeTracer
         private void UpdateTargetVertex()
         {
             VertexFrom = VertexTo;
-            IEnumerable<GridEdge> potentialEdges = VertexFrom.NeighborEdges.Where(t => Grid.GetTraceInfo(t).State == TraceState.None);
-            if (!potentialEdges.Any())
-                potentialEdges = VertexFrom.NeighborEdges;
+            IEnumerable<GridEdge> edgesWithinRadius = VertexFrom.NeighborEdges.Where(t => t.GridPosition.Length <= Grid.Instance.Radius);
+            IEnumerable<GridEdge> untracedEdges = edgesWithinRadius.Where(t => t.TraceInfo().State == TraceState.None);
 
-            GridEdge targetEdge = potentialEdges.Random();
+            GridEdge targetEdge = untracedEdges.Any().Map(untracedEdges, edgesWithinRadius).Random();
             VertexTo = targetEdge.VertexFarthestFrom(VertexFrom.ID);
             OnStartTracingEdge.Invoke(this, CurrentEdge);
         }
