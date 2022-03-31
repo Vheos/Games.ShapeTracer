@@ -9,9 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5892317349997873516}
+  - component: {fileID: 8014844340590353554}
   - component: {fileID: 4349807885663084462}
+  - component: {fileID: 4947781773514101}
   - component: {fileID: 1280680528813782384}
+  - component: {fileID: 746765650955945669}
   - component: {fileID: 1084550049969345627}
+  - component: {fileID: 1563001815945352797}
   - component: {fileID: 6347404057082150448}
   m_Layer: 0
   m_Name: Managers
@@ -35,6 +39,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8014844340590353554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6279414119022488490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01cdd8580eb8d0441b9d6c8241995f17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4349807885663084462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50,6 +66,21 @@ MonoBehaviour:
   <Prefab>k__BackingField: {fileID: 8794971330199703685, guid: ef835f8bd95f49940a85d926b6f2eeaf, type: 3}
   <PersistentComponents>k__BackingField: 0
   <EnsureAnyComponent>k__BackingField: 0
+--- !u!114 &4947781773514101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6279414119022488490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97cad115a6ef1d5479c22d8aab40ce38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Prefab>k__BackingField: {fileID: 0}
+  <PersistentComponents>k__BackingField: 0
+  <EnsureAnyComponent>k__BackingField: 0
 --- !u!114 &1280680528813782384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,6 +94,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Prefab>k__BackingField: {fileID: 2143564755841351578, guid: 4248ade42bbfead47be84fbe572c88e9, type: 3}
+--- !u!114 &746765650955945669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6279414119022488490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb07c39b09bb8104eaad266a71666790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Prefab>k__BackingField: {fileID: 3593832148676391496, guid: 736ecd439ee878941b01fa256baddf0c, type: 3}
 --- !u!114 &1084550049969345627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73,6 +117,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6ea45ac2403ec04db47d94ecb226663, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1563001815945352797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6279414119022488490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ff7d7f19d7060a42bf7292fd2c33d09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &6347404057082150448
