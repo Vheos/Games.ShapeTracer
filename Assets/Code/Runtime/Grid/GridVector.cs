@@ -37,6 +37,18 @@ namespace Vheos.Games.ShapeTracer
         => (this - a).Length;
         public float DistanceTo(GridVector a)
         => (this - a).Length;
+        public GridVector RotateCW()
+        => new(-Y, -Z);
+        public GridVector RotateCW(GridVectorInt around)
+        => (this - around).RotateCW() + around;
+        public GridVector RotateCW(GridVector around)
+        => (this - around).RotateCW() + around;
+        public GridVector RotateCCW()
+        => new(-Z, -X);
+        public GridVector RotateCCW(GridVectorInt around)
+        => (this - around).RotateCCW() + around;
+        public GridVector RotateCCW(GridVector around)
+        => (this - around).RotateCCW() + around;
         public GridVectorInt AxialRound()
         {
             Vector3Int rounded = XYZ.Round();
@@ -48,6 +60,7 @@ namespace Vheos.Games.ShapeTracer
                 _ => Invalid,
             };
         }
+
 
         // Initializers
         public GridVector(float x, float y)
