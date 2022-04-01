@@ -49,8 +49,8 @@ namespace Vheos.Games.ShapeTracer
             Tracer = tracer;
             if (VisualLine == null)
                 VisualLine = VisualLinePool.Get();
-            
-            VisualLine.WorldFrom = tracer.transform.position;
+
+            VisualLine.WorldFrom = Tracer.VertexFrom.WorldPosition;
             VisualLine.AlphaFrom = VisualLine.AlphaTo = 0f;
 
             Grid.Instance.Get<Updatable>().OnUpdate.SubDestroy(tracer, AssignTracerProgress);
@@ -66,8 +66,8 @@ namespace Vheos.Games.ShapeTracer
         private float _progress;
         private void AssignTracerProgress()
         {
-            Progress = Tracer.ProgressAlongEdge.Clamp01();            
-            VisualLine.WorldTo = Tracer.transform.position;
+            Progress = Tracer.ProgressAlongEdge.Clamp01();
+            VisualLine.WorldTo = Tracer.VertexFrom.WorldPosition.Lerp(Tracer.VertexTo.WorldPosition, Progress);
             VisualLine.AlphaFrom = VisualLine.AlphaTo = Progress / 2f;
         }
 
