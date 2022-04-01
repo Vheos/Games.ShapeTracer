@@ -45,6 +45,8 @@ namespace Vheos.Games.ShapeTracer
                 return;
 
             Hide();
+            Player.CoinsCount++;
+            
         }
 
         // Play
