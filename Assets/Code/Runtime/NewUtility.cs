@@ -32,28 +32,6 @@ namespace Vheos.Games.ShapeTracer
         }
         static public EdgeTraceInfo TraceInfo(this GridEdge t)
         => Grid.GetTraceInfo(t);
-        static public GridDirection ToGridDirection(this Axes t, AxisDirection a = AxisDirection.Positive)
-        => t switch
-        {
-            Axes.XY when a == AxisDirection.Positive => GridDirection.RightDown,
-            Axes.X when a == AxisDirection.Positive => GridDirection.Right,
-            Axes.Y when a == AxisDirection.Positive => GridDirection.RightUp,
-            Axes.XY when a == AxisDirection.Negative => GridDirection.LeftUp,
-            Axes.X when a == AxisDirection.Negative => GridDirection.Left,
-            Axes.Y when a == AxisDirection.Negative => GridDirection.LeftDown,
-            _ => GridDirection.Invalid,
-        };
-        static public GridVectorInt ToGridVectorInt(this GridDirection t)
-        => t switch
-        {
-            GridDirection.RightUp => new(0, +1),
-            GridDirection.Right => new(+1, 0),
-            GridDirection.RightDown => new(+1, -1),
-            GridDirection.LeftDown => new(0, -1),
-            GridDirection.Left => new(-1, 0),
-            GridDirection.LeftUp => new(-1, +1),
-            _ => GridVectorInt.Invalid,
-        };
 
         static public float InverseLerp(this Vector2 t, Vector2 a, Vector2 b)
         => (t - a).Dot((b - a).normalized);
@@ -141,33 +119,63 @@ namespace Vheos.Games.ShapeTracer
         }
 #endif
     }
+
+    static public class GridDirections_Extensions
+    {
+        static public GridVectorInt ToOffset(this GridDirections t)
+        => t switch
+        {
+            // Vertex directions
+            GridDirections.XY => GridVectorInt.FromXY(+1, -1),
+            GridDirections.YZ => GridVectorInt.FromYZ(+1, -1),
+            GridDirections.ZX => GridVectorInt.FromZX(+1, -1),
+            GridDirections.NegXY => GridVectorInt.FromXY(-1, +1),
+            GridDirections.NegYZ => GridVectorInt.FromYZ(-1, +1),
+            GridDirections.NegZX => GridVectorInt.FromZX(-1, +1),
+            // Triangle directions
+            GridDirections.XX => GridVectorInt.FromXY(+2, -1),
+            GridDirections.YY => GridVectorInt.FromYZ(+2, -1),
+            GridDirections.ZZ => GridVectorInt.FromZX(+2, -1),
+            GridDirections.NegXX => GridVectorInt.FromXY(-2, +1),
+            GridDirections.NegYY => GridVectorInt.FromYZ(-2, +1),
+            GridDirections.NegZZ => GridVectorInt.FromZX(-2, +1),
+
+            _ => GridVectorInt.Invalid,
+        };
+        static public GridDirections RotateAxisCW(this GridDirections t)
+        => (t & ~GridDirections.Negative) switch
+        {
+            // Vertex directions
+            GridDirections.XY => GridDirections.YZ,
+            GridDirections.YZ => GridDirections.ZX,
+            GridDirections.ZX => GridDirections.XY,
+            // Triangle directions
+            GridDirections.XX => GridDirections.YY,
+            GridDirections.YY => GridDirections.ZZ,
+            GridDirections.ZZ => GridDirections.XX,
+            _ => default,
+        };
+        static public GridDirections RotateAxisCCW(this GridDirections t)
+        => (t & ~GridDirections.Negative) switch
+        {
+            // Vertex directions
+            GridDirections.XY => GridDirections.ZX,
+            GridDirections.YZ => GridDirections.XY,
+            GridDirections.ZX => GridDirections.YZ,
+            // Triangle directions
+            GridDirections.XX => GridDirections.ZZ,
+            GridDirections.YY => GridDirections.XX,
+            GridDirections.ZZ => GridDirections.YY,
+            _ => default,
+        };
+        static public GridDirections RotateCW(this GridDirections t)
+        => t.RotateAxisCW() | ~(t & GridDirections.Negative);
+        static public GridDirections RotateCCW(this GridDirections t)
+        => t.RotateAxisCCW() | ~(t & GridDirections.Negative);
+        static public IEnumerable<GridDirections> NeighborDirections(this GridDirections t)
+        {
+            yield return t.RotateCCW();
+            yield return t.RotateCW();
+        }
+    }
 }
-
-/*
-
-static public Vector3Int VectorInt(this TriangleDirection t)
-=> t switch
-{
-    TriangleDirection.RightDown => new(+1, 00, 00),
-    TriangleDirection.RightUp => new(+1, +1, 00),
-    TriangleDirection.Up => new(00, +1, 00),
-    TriangleDirection.LeftUp => new(00, +1, +1),
-    TriangleDirection.LeftDown => new(00, 00, +1),
-    TriangleDirection.Down => new(+1, 00, +1),
-    _ => default,
-};
-static public Vector3 Vector(this TriangleDirection t)
-=> t.VectorInt();
-
-static public class Axis_Extensions
-{
-    static public Vector3Int Vector3Int(this Axes t)
-    => new(t.HasFlag(Axes.X).To01(),
-           t.HasFlag(Axes.Y).To01(),
-           t.HasFlag(Axes.Z).To01());
-    static public Axes SetDirection(ref Axes t, AxisDirection a)
-    => t |= (Axes)a;
-    static public AxisDirection Direction(Axes t)
-    => (AxisDirection)t & AxisDirection.Positive;
-}
-*/
