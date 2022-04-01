@@ -49,6 +49,8 @@ namespace Vheos.Games.ShapeTracer
                 DebugLog.text += $"Vertex: {closestVertex.ID}\n";
                 DebugLog.text += $"Edge: {closestEdge.ID}\n";
                 DebugLog.text += $"Triangle: {closestTriangle.ID}\n";
+                var offsetFromClosest = mouseGridPosition - closestVertex.GridPosition;
+                DebugLog.text += $"{offsetFromClosest}   ->   {offsetFromClosest.XYZ.RoundAwayFromZero()}\n";
             }
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
@@ -87,11 +89,6 @@ namespace Vheos.Games.ShapeTracer
                     Debug.DrawLine(mouseWorldPosition, triangle.WorldPosition, Color.blue, 1f);
                 }
                 Debug.Log($"");
-
-                foreach (var triangle in closestTriangle.Edges.First().NeighborTriangles)
-                {
-                    Debug.DrawLine(mouseWorldPosition, triangle.WorldPosition, Color.magenta, 1f);
-                }
 
                 /* triangle from 3x vertex
                 Debug.Log($"");
