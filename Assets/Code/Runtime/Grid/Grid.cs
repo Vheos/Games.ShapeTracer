@@ -1,6 +1,7 @@
 namespace Vheos.Games.ShapeTracer
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using UnityEngine;
     using Games.Core;
@@ -19,10 +20,10 @@ namespace Vheos.Games.ShapeTracer
         static public AutoEvent<GridTriangle> OnFullyTraceTriangle;
 
         // Publics
-        static public Vector2Int InvalidID
-        => int.MaxValue.ToVector2Int();
-        static public IReadOnlyTwoWayDictionary<GridDirection, GridVector> GridDirectionsAndVectors
-        => _GridDirectionsAndVectors;
+        static public IReadOnlyTwoWayDictionary<GridDirections, GridVectorInt> VertexDirectionsAndVectors
+        => _vertexDirectionsAndVectors;
+        static public IReadOnlyTwoWayDictionary<GridDirections, GridVectorInt> TriangleDirectionsAndVectors
+        => _triangleDirectionsAndVectors;
         static public GridVector WorldToGridPosition(Vector3 worldPosition)
         {
             if (Instance != null)
@@ -38,24 +39,12 @@ namespace Vheos.Games.ShapeTracer
                 worldPosition = worldPosition.Transform(Instance.transform);
             return worldPosition;
         }
-        static public GridVector TestVertexAt(Vector3 worldPosition)
-        {
-            if (Instance != null)
-                worldPosition = worldPosition.Untransform(Instance.transform);
-
-            Vector3 rounded = worldPosition.Round();
-            Vector3 reminder = worldPosition - rounded;
-
-            return reminder.x.Abs() >= reminder.y.Abs()
-                 ? new(rounded.x + (reminder.x + 0.5f * reminder.y).Round(), rounded.y)
-                 : new(rounded.x, rounded.y + (reminder.y + 0.5f * reminder.x).Round());
-        }
         static public GridVertex VertexAt(GridVector gridPosition)
         => new(gridPosition.AxialRound());
         static public GridVertex VertexAt(Vector3 worldPosition)
         => VertexAt(WorldToGridPosition(worldPosition));
         static public GridEdge EdgeAt(GridVector gridPosition)
-        => default;
+        => TriangleAt(gridPosition).EdgeClosestTo(gridPosition);
         static public GridEdge EdgeAt(Vector3 worldPosition)
         => EdgeAt(WorldToGridPosition(worldPosition));
         static public GridTriangle TriangleAt(GridVector gridPosition)
@@ -68,13 +57,14 @@ namespace Vheos.Games.ShapeTracer
         => TriangleAt(WorldToGridPosition(worldPosition));
         static public EdgeTraceInfo GetTraceInfo(GridEdge edge)
         {
-            _infosByEdge.TryAdd(edge, new(edge));
-            return _infosByEdge[edge];
+            _traceInfosByEdge.TryAdd(edge, new(edge));
+            return _traceInfosByEdge[edge];
         }
 
         // Privates
-        static private TwoWayDictionary<GridDirection, GridVector> _GridDirectionsAndVectors;
-        static private Dictionary<GridEdge, EdgeTraceInfo> _infosByEdge;
+        static private TwoWayDictionary<GridDirections, GridVectorInt> _vertexDirectionsAndVectors;
+        static private TwoWayDictionary<GridDirections, GridVectorInt> _triangleDirectionsAndVectors;
+        static private Dictionary<GridEdge, EdgeTraceInfo> _traceInfosByEdge;
         static private void Tracer_OnStopTracingEdge(Tracer tracer, GridEdge edge)
         {
             edge.TraceInfo().Disconnect();
@@ -99,11 +89,24 @@ namespace Vheos.Games.ShapeTracer
         protected override void PlayAwake()
         {
             base.PlayAwake();
-            _GridDirectionsAndVectors = new();
-            foreach (var direction in NewUtility.GetEnumValues<GridDirection>(true, true))
-                _GridDirectionsAndVectors.Add(direction, direction.ToGridVectorInt());
 
-            _infosByEdge = new();
+            _vertexDirectionsAndVectors = new();
+            foreach (var positiveDirection in new[] { GridDirections.XY, GridDirections.YZ, GridDirections.ZX })
+            {
+                GridDirections negativeDirection = positiveDirection | GridDirections.Negative;
+                _vertexDirectionsAndVectors.Add(positiveDirection, positiveDirection.ToOffset());
+                _vertexDirectionsAndVectors.Add(negativeDirection, negativeDirection.ToOffset());
+            }
+
+            _triangleDirectionsAndVectors = new();
+            foreach (var positiveDirection in new[] { GridDirections.XX, GridDirections.YY, GridDirections.ZZ })
+            {
+                GridDirections negativeDirection = positiveDirection | GridDirections.Negative;
+                _triangleDirectionsAndVectors.Add(positiveDirection, positiveDirection.ToOffset());
+                _triangleDirectionsAndVectors.Add(negativeDirection, negativeDirection.ToOffset());
+            }
+
+            _traceInfosByEdge = new();
 
             OnFullyTraceEdge = new();
             OnFullyTraceTriangle = new();

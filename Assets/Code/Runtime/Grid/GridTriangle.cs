@@ -21,11 +21,13 @@ namespace Vheos.Games.ShapeTracer
 
         public bool IsEven
         => ID.XY.CompSum().PosMod(3) == 2;
+        public bool IsOdd
+        => ID.XY.CompSum().PosMod(3) == 1;
         public IEnumerable<GridVertex> Vertices
         {
             get
             {
-                foreach (var offset in GetRawTriangleOffsets(IsEven))
+                foreach (var offset in GetTriangleOffsets(IsEven))
                     yield return new((ID + offset) / 3);
             }
         }
@@ -43,7 +45,7 @@ namespace Vheos.Games.ShapeTracer
         {
             get
             {
-                foreach (var offset in GetRawTriangleOffsets(!IsEven))
+                foreach (var offset in GetTriangleOffsets(IsOdd))
                     yield return new(ID + offset);
             }
         }
@@ -56,17 +58,26 @@ namespace Vheos.Games.ShapeTracer
         => VerticesSortedByDistanceFrom(gridPosition).First();
         public GridVertex VertexFarthestFrom(GridVector gridPosition)
         => VerticesSortedByDistanceFrom(gridPosition, true).First();
+        public GridEdge EdgeClosestTo(GridVector gridPosition)
+        {
+            GridVertex[] sortedVertices = VerticesSortedByDistanceFrom(gridPosition).ToArray();
+            return new(sortedVertices[0].ID + sortedVertices[1].ID);
+        }
+        public GridEdge EdgeFarthestFrom(GridVector gridPosition)
+        {
+            GridVertex[] sortedVertices = VerticesSortedByDistanceFrom(gridPosition, true).ToArray();
+            return new(sortedVertices[0].ID + sortedVertices[1].ID);
+        }
 
         public bool IsAdjacent(GridTriangle triangle)
         => ID.DistanceTo(triangle.ID) == 2;
 
         // Privates
-        static private IEnumerable<GridVectorInt> GetRawTriangleOffsets(bool isEven)
+        static private IEnumerable<GridVectorInt> GetTriangleOffsets(bool positive)
         {
-            int sign = isEven.ToSign();
-            yield return new GridVectorInt(-1, -1) * sign;
-            yield return new GridVectorInt(+2, -1) * sign;
-            yield return new GridVectorInt(-1, +2) * sign;
+            foreach (var directionAndVector in Grid.TriangleDirectionsAndVectors.KeyValuePairs)
+                if (directionAndVector.Key.HasFlag(GridDirections.Negative) != positive)
+                    yield return directionAndVector.Value;
         }
 
         // Constructors

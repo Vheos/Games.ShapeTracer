@@ -19,15 +19,17 @@ namespace Vheos.Games.ShapeTracer
         public Vector3 WorldPosition
         => Grid.GridToWorldPosition(GridPosition);
 
-        public Axes Axis
+        public GridDirections Axis
         {
             get
             {
-                Axes axis = 0;
+                GridDirections axis = 0;
                 if (ID.X.IsOdd())
-                    axis |= Axes.X;
+                    axis |= GridDirections.X;
                 if (ID.Y.IsOdd())
-                    axis |= Axes.Y;
+                    axis |= GridDirections.Y;
+                if (ID.Z.IsOdd())
+                    axis |= GridDirections.Z;
                 return axis;
             }
         }
@@ -35,7 +37,7 @@ namespace Vheos.Games.ShapeTracer
         {
             get
             {
-                GridVectorInt directionOffset = Axis.ToGridDirection().ToGridVectorInt();
+                GridVectorInt directionOffset = Axis.ToOffset();
                 yield return new((ID - directionOffset) / 2);
                 yield return new((ID + directionOffset) / 2);
             }
@@ -44,7 +46,7 @@ namespace Vheos.Games.ShapeTracer
         {
             get
             {
-                GridVectorInt directionOffset = Axis.ToGridDirection().ToGridVectorInt();
+                GridVectorInt directionOffset = Axis.ToOffset();
                 GridVectorInt firstVertexID = (ID - directionOffset) / 2;
                 yield return new(ID + firstVertexID + directionOffset.RotateCW());
                 yield return new(ID + firstVertexID + directionOffset.RotateCCW());

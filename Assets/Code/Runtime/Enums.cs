@@ -1,7 +1,7 @@
-using Vheos.Games.Core;
-
 namespace Vheos.Games.ShapeTracer
 {
+    using System;
+    using Vheos.Games.Core;
 
     public enum TraceState
     {
@@ -10,37 +10,32 @@ namespace Vheos.Games.ShapeTracer
         Full,
     }
 
-    public enum GridDirection
+    [Flags]
+    public enum GridDirections
     {
-        RightDown = Axes.XY | AxisDirection.Positive,
-        Right = Axes.X | AxisDirection.Positive,
-        RightUp = Axes.Y | AxisDirection.Positive,
-        LeftUp = Axes.XY | AxisDirection.Negative,
-        Left = Axes.X | AxisDirection.Negative,
-        LeftDown = Axes.Y | AxisDirection.Negative,
+        X = Axes.X,
+        Y = Axes.Y,
+        Z = Axes.Z,
+        Negative = 1 << 3,
 
-        DownRight = RightDown,
-        UpRight = RightUp,
-        UpLeft = LeftUp,
-        DownLeft = LeftDown,
+        XX = X | X,
+        XY = X | Y,
+        XZ = X | Z,
+        YX = Y | X,
+        YY = Y | Y,
+        YZ = Y | Z,
+        ZX = Z | X,
+        ZY = Z | Y,
+        ZZ = Z | Z,
 
-        Invalid = -1,
-    }
-
-    public enum TriangleDirection
-    {
-        RightDown,
-        RightUp,
-        Up,
-        LeftUp,
-        LeftDown,
-        Down,
-
-        DownRight = RightDown,
-        UpRight = RightUp,
-        UpLeft = LeftUp,
-        DownLeft = LeftDown,
-
-        Invalid = -1,
+        NegXX = XX | Negative,
+        NegXY = XY | Negative,
+        NegXZ = XZ | Negative,
+        NegYX = YX | Negative,
+        NegYY = YY | Negative,
+        NegYZ = YZ | Negative,
+        NegZX = ZX | Negative,
+        NegZY = ZY | Negative,
+        NegZZ = ZZ | Negative,
     }
 }

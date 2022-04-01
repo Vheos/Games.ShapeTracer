@@ -23,7 +23,7 @@ namespace Vheos.Games.ShapeTracer
         {
             get
             {
-                foreach (var offset in Grid.GridDirectionsAndVectors.Values)
+                foreach (var offset in Grid.VertexDirectionsAndVectors.Values)
                     yield return new(ID + offset);
             }
         }
@@ -48,8 +48,21 @@ namespace Vheos.Games.ShapeTracer
                 yield return new(ID + vertices[5].ID + vertices[0].ID);
             }
         }
+
+        public GridVertex GetVertex(GridDirections direction)
+        => new(ID + direction.ToOffset());
+        public GridEdge GetEdge(GridDirections direction)
+        => new(ID * 2 + direction.ToOffset());
+        public GridTriangle GetTriangle(GridDirections direction)
+        => new(ID * 3 + direction.ToOffset());
+
         public bool IsAdjacentTo(GridVertex vertex)
         => ID.DistanceTo(vertex.ID) == 1;
+        public IEnumerable<GridVertex> GetOppositeVertices(GridDirections direction)
+        {
+            foreach (var vertexDirection in direction.NeighborDirections())
+                yield return new(ID + vertexDirection.ToOffset());
+        }
 
         // Constructors
         public GridVertex(GridVectorInt id)

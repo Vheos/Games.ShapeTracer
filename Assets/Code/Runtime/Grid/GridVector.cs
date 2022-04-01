@@ -72,7 +72,13 @@ namespace Vheos.Games.ShapeTracer
         => new() { X = x, Y = y };
         static public GridVector FromXZ(float x, float z)
         => new() { X = x, Y = -x - z };
+        static public GridVector FromYX(float y, float x)
+        => new() { X = x, Y = y };
         static public GridVector FromYZ(float y, float z)
+        => new() { X = -y - z, Y = y };
+        static public GridVector FromZX(float z, float x)
+        => new() { X = x, Y = -x - z };
+        static public GridVector FromZY(float z, float y)
         => new() { X = -y - z, Y = y };
         static public GridVector Zero
         => new() { X = 0f, Y = 0f };
