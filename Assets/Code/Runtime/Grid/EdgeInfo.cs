@@ -1,6 +1,7 @@
 namespace Vheos.Games.ShapeTracer
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using UnityEngine;
     using Games.Core;
@@ -8,7 +9,7 @@ namespace Vheos.Games.ShapeTracer
     using Tools.Extensions.UnityObjects;
     using Tools.Extensions.Math;
 
-    public class EdgeTraceInfo
+    public class EdgeInfo
     {
         // Publics
         public GridEdge Edge
@@ -16,26 +17,29 @@ namespace Vheos.Games.ShapeTracer
         public float Progress
         {
             get => _progress;
-            private set
+            set
             {
-                float clampedValue = value.Clamp01();
-                if (_progress == clampedValue)
+                var clampedValue = value.Clamp01();
+                if (clampedValue == _progress)
                     return;
 
+                var previousProgress = _progress;
                 _progress = clampedValue;
-                if (State == TraceState.Full)
-                {
-                    Grid.OnFullyTraceEdge.Invoke(Edge);
-                    foreach (var triangle in Edge.NeighborTriangles)
-                        if (triangle.IsFullyTraced())
-                            Grid.OnFullyTraceTriangle.Invoke(triangle);
-                }
+
+                Grid.OnChangeEdgeTraceProgress.Invoke(this, previousProgress, _progress);
             }
         }
         public VisualLine VisualLine
-        { get; private set; }
+        {
+            get
+            {
+                if (_visualLine == null)
+                    _visualLine = VisualLinePool.Get();
+                return _visualLine;
+            }
+        }
         public Tracer Tracer
-        { get; private set; }
+        { get; set; }
 
         public TraceState State
         => _progress switch
@@ -47,11 +51,9 @@ namespace Vheos.Games.ShapeTracer
         public void ConnectTo(Tracer tracer)
         {
             Tracer = tracer;
-            if (VisualLine == null)
-                VisualLine = VisualLinePool.Get();
 
             VisualLine.WorldFrom = Tracer.VertexFrom.WorldPosition;
-            VisualLine.AlphaFrom = VisualLine.AlphaTo = 0f;
+            VisualLine.RGBFrom = Color.red;
 
             Grid.Instance.Get<Updatable>().OnUpdate.SubDestroy(tracer, AssignTracerProgress);
             AssignTracerProgress();
@@ -64,15 +66,18 @@ namespace Vheos.Games.ShapeTracer
 
         // Privates
         private float _progress;
+        private VisualLine _visualLine;
         private void AssignTracerProgress()
         {
             Progress = Tracer.ProgressAlongEdge.Clamp01();
             VisualLine.WorldTo = Tracer.VertexFrom.WorldPosition.Lerp(Tracer.VertexTo.WorldPosition, Progress);
-            VisualLine.AlphaFrom = VisualLine.AlphaTo = Progress / 2f;
+            VisualLine.RGBFrom = Color.green * Progress;
         }
 
         // Initializers
-        public EdgeTraceInfo(GridEdge edge)
+        private EdgeInfo()
+        { }
+        public EdgeInfo(GridEdge edge)
         => Edge = edge;
     }
 }

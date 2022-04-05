@@ -16,10 +16,14 @@ namespace Vheos.Games.ShapeTracer
         [field: SerializeField, Range(1, 50)] public int Radius { get; private set; }
 
         // Events
-        static public AutoEvent<GridEdge> OnFullyTraceEdge;
-        static public AutoEvent<GridTriangle> OnFullyTraceTriangle;
+        static public AutoEvent<EdgeInfo, float, float> OnChangeEdgeTraceProgress;
+        static public AutoEvent<GridTriangle, float> OnChangeTriangleTraceProgress;
 
         // Publics
+        static public int EdgesCount
+        => 9 * Instance.Radius.Sqrd() + 3 * Instance.Radius;
+        static public int TrianglesCount
+        => 6 * Instance.Radius.Sqrd();
         static public IReadOnlyTwoWayDictionary<GridDirections, GridVectorInt> VertexDirectionsAndVectors
         => _vertexDirectionsAndVectors;
         static public IReadOnlyTwoWayDictionary<GridDirections, GridVectorInt> TriangleDirectionsAndVectors
@@ -55,7 +59,7 @@ namespace Vheos.Games.ShapeTracer
         }
         static public GridTriangle TriangleAt(Vector3 worldPosition)
         => TriangleAt(WorldToGridPosition(worldPosition));
-        static public EdgeTraceInfo GetTraceInfo(GridEdge edge)
+        static public EdgeInfo GetTraceInfo(GridEdge edge)
         {
             _traceInfosByEdge.TryAdd(edge, new(edge));
             return _traceInfosByEdge[edge];
@@ -64,15 +68,17 @@ namespace Vheos.Games.ShapeTracer
         // Privates
         static private TwoWayDictionary<GridDirections, GridVectorInt> _vertexDirectionsAndVectors;
         static private TwoWayDictionary<GridDirections, GridVectorInt> _triangleDirectionsAndVectors;
-        static private Dictionary<GridEdge, EdgeTraceInfo> _traceInfosByEdge;
+        static private Dictionary<GridEdge, EdgeInfo> _traceInfosByEdge;
+        static private void Tracer_OnStartTracingEdge(Tracer tracer, GridEdge edge)
+        {
+            if (edge.TraceInfo().State != TraceState.None)
+                return;
+
+            edge.TraceInfo().ConnectTo(tracer);
+        }
         static private void Tracer_OnStopTracingEdge(Tracer tracer, GridEdge edge)
         {
             edge.TraceInfo().Disconnect();
-        }
-        static private void Tracer_OnStartTracingEdge(Tracer tracer, GridEdge edge)
-        {
-            if (edge.TraceInfo().State == TraceState.None)
-                edge.TraceInfo().ConnectTo(tracer);
         }
         static private void Grid_OnFullyTracedTriangle(GridTriangle triangle)
         {
@@ -108,10 +114,8 @@ namespace Vheos.Games.ShapeTracer
 
             _traceInfosByEdge = new();
 
-            OnFullyTraceEdge = new();
-            OnFullyTraceTriangle = new();
-
-            OnFullyTraceTriangle.SubDestroy(this, Grid_OnFullyTracedTriangle);
+            OnChangeEdgeTraceProgress = new();
+            OnChangeTriangleTraceProgress = new();
         }
         protected override void PlayStart()
         {
