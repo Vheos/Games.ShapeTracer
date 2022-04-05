@@ -30,7 +30,7 @@ namespace Vheos.Games.ShapeTracer
                     return false;
             return true;
         }
-        static public EdgeTraceInfo TraceInfo(this GridEdge t)
+        static public EdgeInfo TraceInfo(this GridEdge t)
         => Grid.GetTraceInfo(t);
 
         static public float InverseLerp(this Vector2 t, Vector2 a, Vector2 b)
