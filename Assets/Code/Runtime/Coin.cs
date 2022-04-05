@@ -64,6 +64,7 @@ namespace Vheos.Games.ShapeTracer
         protected override void PlayAwake()
         {
             base.PlayAwake();
+            this.BecomeChildOf(Grid.Instance);
             Get<Selectable>().OnRelease.SubEnableDisable(this, Selectable_OnRelease);
         }
     }
