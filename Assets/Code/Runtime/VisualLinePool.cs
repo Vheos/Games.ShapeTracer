@@ -12,12 +12,5 @@ namespace Vheos.Games.ShapeTracer
 
     public class VisualLinePool : AComponentPool<VisualLinePool, VisualLine>
     {
-        // Privates
-        protected override VisualLine CreateComponent()
-        {
-            VisualLine newLine = base.CreateComponent();
-            newLine.BecomeChildOf(Grid.Instance);
-            return newLine;
-        }
     }
 }

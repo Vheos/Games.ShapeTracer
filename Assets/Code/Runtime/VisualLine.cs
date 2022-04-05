@@ -71,6 +71,7 @@ namespace Vheos.Games.ShapeTracer
         protected override void PlayAwake()
         {
             base.PlayAwake();
+            this.BecomeChildOf(Grid.Instance);
             _lineRenderer = Get<LineRenderer>();
         }
     }
